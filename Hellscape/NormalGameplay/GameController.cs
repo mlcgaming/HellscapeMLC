@@ -15,6 +15,8 @@ namespace Hellscape.NormalGameplay
 {
     public class GameController
     {
+        private event EventHandler PlayerMoveProposal;
+
         private ContentManager Content { get; set; }
         private MapContainer MapContainer { get; set; }
         private ActorPlayer Player { get; set; }
@@ -54,7 +56,7 @@ namespace Hellscape.NormalGameplay
             MapContainer = new MapContainer();
             Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(0, 0));
 
-            
+            Player.PlayerMove += PlayerMoveProposal;
 
             Mode = GameMode.Normal;
             LoadState = MapLoadState.Preparing;
@@ -76,6 +78,12 @@ namespace Hellscape.NormalGameplay
         public void Draw()
         {
             
+        }
+
+        public void OnPlayerMove()
+        {
+            // Check for Collisions against ProposedPosition on Player
+
         }
     }
 }

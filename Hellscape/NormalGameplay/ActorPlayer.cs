@@ -13,6 +13,8 @@ namespace Hellscape
 {
     public class ActorPlayer
     {
+        public event EventHandler PlayerMove;
+
         public int ID { get; protected set; }
         public PlayerIndex Controller { get; protected set; }
         public Texture2D Sprite { get; protected set; }
@@ -20,6 +22,7 @@ namespace Hellscape
         private Vector2 Velocity { get; set; }
         private Vector2 FallVector { get; set; }
         public Rectangle CollisionMask { get; protected set; }
+        public Rectangle ProposedMask { get; private set; }
         private ContentManager Content { get; set; }
         private float MoveSpeed { get; set; }
         private float WalkSpeed { get; set; }
@@ -47,7 +50,8 @@ namespace Hellscape
             IsColliding = false;
             IsGrounded = true;
 
-            CreateCollisionMask(16, 24);
+            CreateCollisionMask(CollisionMask, 16, 24);
+            CreateCollisionMask(ProposedMask, 16, 24);
         }
 
         public void Update(GameTime gameTime)
@@ -77,7 +81,7 @@ namespace Hellscape
             
             Position = Position + Velocity;
 
-            CreateCollisionMask(16, 24);
+            CreateCollisionMask(CollisionMask, 16, 24);
         }
         public void Draw(SpriteBatch spriteBatch)
         {
@@ -96,11 +100,17 @@ namespace Hellscape
                 float adjustedMoveSpeed = (int)Math.Round(gpState.ThumbSticks.Left.X * velocityRate);
                 Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
 
+                if(Velocity != new Vector2(0))
+                {
+                    OnPlayerMove();
+                }
+
                 if(IsGrounded == true && gpState.IsButtonDown(Buttons.A) == true)
                 {
                     float jumpRate = WalkSpeed * deltaTime;
                     FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 6f));
                     IsGrounded = false;
+                    OnPlayerMove();
                 }
 
                 if(gpState.IsButtonDown(Buttons.X) == true)
@@ -114,9 +124,9 @@ namespace Hellscape
             }
         }
 
-        private void CreateCollisionMask(int width, int height)
+        private void CreateCollisionMask(Rectangle rect, int width, int height)
         {
-            CollisionMask = new Rectangle((int)Position.X, (int)Position.Y, width, height);
+            rect = new Rectangle((int)Position.X, (int)Position.Y, width, height);
         }
         public void AddCollision(Rectangle collisionRectangle)
         {
@@ -184,6 +194,11 @@ namespace Hellscape
             adjustPosition = new Vector2(adjustedX, adjustedY);
             Position = Position + adjustPosition;
             CreateCollisionMask(16, 24);
+        }
+
+        public void OnPlayerMove()
+        {
+            PlayerMove?.Invoke(this, EventArgs.Empty);
         }
     }
 }
