@@ -49,7 +49,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="NormalGameplay\GameController.cs" />
-    <Compile Include="NormalGameplay\Map Handling\MapController.cs" />
+    <Compile Include="NormalGameplay\Map Handling\MapContainer.cs" />
     <Compile Include="PreGame\MainMenu\MainMenuController.cs" />
     <Compile Include="PreGame\MainMenu\MainMenuItem.cs" />
     <Compile Include="PreGame\PreGameContainer.cs" />

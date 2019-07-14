@@ -26,6 +26,8 @@ namespace Hellscape
 
         List<EntityCollisionSolid> MapCollisionMasks;
 
+        GameController GameController;
+
         public enum WindowState
         {
             MainMenu,
@@ -47,21 +49,9 @@ namespace Hellscape
             graphics.IsFullScreen = Global.GLOBAL_OPT_FULLSCREEN_ENABLED;
             graphics.ApplyChanges();
 
+            GameController = new GameController();
+
             State = WindowState.NormalPlay;
-
-            MapRenderer = new TiledMapRenderer(GraphicsDevice);
-
-            var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 256, 144);
-
-            MapCamera = new Camera2D(viewportAdapter);
-            MapCamera.Origin = new Vector2(0, 0);
-            MapCamera.Position = new Vector2(0, 0);
-
-            Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(112, 104));
-
-            MapContainer = new MapContainer();
-            ActiveMap = MapContainer.LoadMap("testStageRoom1");
-            MapCollisionMasks = MapContainer.CollisionSolids;
 
             base.Initialize();
         }
@@ -83,18 +73,7 @@ namespace Hellscape
                     }
                 case WindowState.NormalPlay:
                     {
-                        MapRenderer.Update(ActiveMap, gameTime);
-                        Player.Update(gameTime);
-
-                        foreach(EntityCollisionSolid ecs in MapCollisionMasks)
-                        {
-                            if(Player.CollisionMask.Intersects(ecs.CollisionMask) == true)
-                            {
-                                Rectangle _collisionRectangle = Rectangle.Intersect(Player.CollisionMask, ecs.CollisionMask);
-                                Player.AddCollision(_collisionRectangle);
-                            }
-                        }
-
+                        GameController.Update(gameTime);
                         break;
                     }
             }
@@ -105,10 +84,6 @@ namespace Hellscape
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            var transformMatrix = MapCamera.GetViewMatrix();
-
-            spriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
-
             switch (State)
             {
                 case WindowState.MainMenu:
@@ -118,13 +93,10 @@ namespace Hellscape
                     }
                 case WindowState.NormalPlay:
                     {
-                        MapRenderer.Draw(ActiveMap, MapCamera.GetViewMatrix());
-                        Player.Draw(spriteBatch);
+                        GameController.Draw(spriteBatch);
                         break;
                     }
             }
-
-            spriteBatch.End();
 
             base.Draw(gameTime);
         }

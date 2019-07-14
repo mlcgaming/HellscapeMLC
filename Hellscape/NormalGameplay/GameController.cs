@@ -11,7 +11,7 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Graphics;
 using MonoGame.Extended.ViewportAdapters;
 
-namespace Hellscape.NormalGameplay
+namespace Hellscape
 {
     public class GameController
     {
@@ -26,6 +26,7 @@ namespace Hellscape.NormalGameplay
         private TiledMap ActiveMap { get; set; }
         private GameMode Mode { get; set; }
         private MapLoadState LoadState { get; set; }
+        private List<EntityCollisionSolid> MapCollisionMasks { get; set; }
         
         enum MapLoadState
         {
@@ -54,9 +55,22 @@ namespace Hellscape.NormalGameplay
             Content = Global.Content;
 
             MapContainer = new MapContainer();
-            Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(0, 0));
 
-            Player.PlayerMove += PlayerMoveProposal;
+            Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(112, 104));
+            Player.PlayerMoved += OnPlayerMove;
+
+            MapRenderer = new TiledMapRenderer(Global.Graphics.GraphicsDevice);
+
+            var viewportAdapter = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 256, 144);
+
+            GameCamera = new Camera2D(viewportAdapter);
+            GameCamera.Origin = new Vector2(0, 0);
+            GameCamera.Position = new Vector2(0, 0);
+
+            MapContainer = new MapContainer();
+            ActiveMap = MapContainer.LoadMap("testStageRoom1");
+            MapCollisionMasks = MapContainer.CollisionSolids;
+
 
             Mode = GameMode.Normal;
             LoadState = MapLoadState.Preparing;
@@ -64,26 +78,32 @@ namespace Hellscape.NormalGameplay
 
         public void Update(GameTime gameTime)
         {
+            MapRenderer.Update(ActiveMap, gameTime);
             Player.Update(gameTime);
+        }
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            var transformMatrix = GameCamera.GetViewMatrix();
 
-            foreach(EntityCollisionSolid solid in MapContainer.CollisionSolids)
+            spriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+
+            MapRenderer.Draw(ActiveMap, GameCamera.GetViewMatrix());
+            Player.Draw(spriteBatch);
+
+            spriteBatch.End();
+        }
+
+        public void OnPlayerMove(object source, EventArgs e)
+        {
+            // Check for Collisions against ProposedPosition on Player
+            foreach (EntityCollisionSolid solid in MapContainer.CollisionSolids)
             {
-                if(Player.CollisionMask.Intersects(solid.CollisionMask) == true)
+                if (Player.ProposedMask.Intersects(solid.CollisionMask) == true)
                 {
-                    Rectangle _collision = Rectangle.Intersect(Player.CollisionMask, solid.CollisionMask);
+                    Rectangle _collision = Rectangle.Intersect(Player.ProposedMask, solid.CollisionMask);
                     Player.AddCollision(_collision);
                 }
             }
-        }
-        public void Draw()
-        {
-            
-        }
-
-        public void OnPlayerMove()
-        {
-            // Check for Collisions against ProposedPosition on Player
-
         }
     }
 }
