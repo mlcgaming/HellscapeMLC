@@ -24,14 +24,22 @@ namespace Hellscape
         private Vector2 Velocity { get; set; }
         private Vector2 FallVector { get; set; }
         public Rectangle CollisionMask { get; protected set; }
-        public Rectangle ProposedMask { get; private set; }
-        private ContentManager Content { get; set; }
-        private float MoveSpeed { get; set; }
-        private float WalkSpeed { get; set; }
-        private float RunSpeed { get; set; }
-        private List<Rectangle> Collisions { get; set; }
-        private bool IsColliding { get; set; }
-        private bool IsGrounded { get; set; }
+        private ContentManager Content;
+        private float MoveSpeed;
+        private float WalkSpeed;
+        private float RunSpeed;
+        private List<Rectangle> Collisions;
+        private bool IsColliding;
+        private bool IsGrounded;
+        private ActorFacing Facing;
+        enum ActorFacing
+        {
+            Left,
+            Right
+        }
+
+        private AnimationManager AnimationManager;
+        private Dictionary<string, Animation> AnimationLibrary;
 
         public ActorPlayer(int id, PlayerIndex controller, Vector2 position)
         {
@@ -47,16 +55,28 @@ namespace Hellscape
             RunSpeed = 128f;
             MoveSpeed = WalkSpeed;
 
-            Sprite = Content.Load<Texture2D>("GFX/Characters/MainCharacter");
-
             Collisions = new List<Rectangle>();
             IsColliding = false;
             IsGrounded = true;
 
-            CreateCollisionMask(16, 24);
-            CreateCollisionMask(16, 24);
+            CreateCollisionMask(Position, 16, 24);
+
+            AnimationManager = new AnimationManager();
+            AnimationLibrary = new Dictionary<string, Animation>();
+            Facing = ActorFacing.Right;
+
+            LoadContent();
+
+            AnimationManager.Play(AnimationLibrary["idle"]);
         }
 
+        public void LoadContent()
+        {
+            Animation idle = new Animation(Content.Load<Texture2D>("GFX/Characters/MainCharacterTemplate"), 4, 24, 16, 0.075f, new Vector2(0, 0));
+            Animation jump = new Animation(Content.Load<Texture2D>("GFX/Characters/MainCharacterTemplate"), 1, 24, 16, 0f, new Vector2(0, 48));
+            AnimationLibrary.Add("idle", idle);
+            AnimationLibrary.Add("jump", jump);
+        }
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -73,12 +93,13 @@ namespace Hellscape
                 }
 
                 Velocity = Velocity + FallVector;
+                AnimationManager.Play(AnimationLibrary["jump"]);
             }
 
             if (Velocity != new Vector2(0, 0))
             {
                 ProposedPosition = Position + Velocity;
-                CreateProposalMask(16, 24);
+                CreateCollisionMask(ProposedPosition, 16, 24);
                 OnPlayerMoved();
 
                 if (IsColliding == true)
@@ -94,12 +115,23 @@ namespace Hellscape
 
                 Position = ProposedPosition;
                 Velocity = new Vector2(0);
-                CreateCollisionMask(16, 24);
+                CreateCollisionMask(Position, 16, 24);
             }
+
+            AnimationManager.Update(gameTime);
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Sprite, Position, Color.White);
+            if(Facing == ActorFacing.Right)
+            {
+                AnimationManager.Draw(spriteBatch, CollisionMask, SpriteEffects.None);
+            }
+            else
+            {
+                AnimationManager.Draw(spriteBatch, CollisionMask, SpriteEffects.FlipHorizontally);
+            }
+            
+            //spriteBatch.Draw(Sprite, Position, Color.White);
         }
 
         private void ProcessInput(float deltaTime)
@@ -119,6 +151,16 @@ namespace Hellscape
                     float jumpRate = WalkSpeed * deltaTime;
                     FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 6f));
                     IsGrounded = false;
+                    AnimationManager.Play(AnimationLibrary["jump"]);
+                }
+
+                if(Velocity.X > 0)
+                {
+                    Facing = ActorFacing.Right;
+                }
+                else if (Velocity.X < 0)
+                {
+                    Facing = ActorFacing.Left;
                 }
 
                 if(gpState.IsButtonDown(Buttons.X) == true)
@@ -132,13 +174,9 @@ namespace Hellscape
             }
         }
 
-        private void CreateCollisionMask(int width, int height)
+        private void CreateCollisionMask(Vector2 position, int width, int height)
         {
-            CollisionMask = new Rectangle((int)Position.X, (int)Position.Y, width, height);
-        }
-        private void CreateProposalMask(int width, int height)
-        {
-            ProposedMask = new Rectangle((int)ProposedPosition.X, (int)ProposedPosition.Y, width, height);
+            CollisionMask = new Rectangle((int)position.X, (int)position.Y, width, height);
         }
         public void AddCollision(Rectangle collisionRectangle)
         {
@@ -180,6 +218,7 @@ namespace Hellscape
                     adjustedY = -(collisionMask.Height);
                     IsGrounded = true;
                     FallVector = new Vector2(0);
+                    AnimationManager.Play(AnimationLibrary["idle"]);
                 }
                 else
                 {

@@ -15,8 +15,6 @@ namespace Hellscape
 {
     public class GameController
     {
-        private event EventHandler PlayerMoveProposal;
-
         private ContentManager Content { get; set; }
         private MapContainer MapContainer { get; set; }
         private ActorPlayer Player { get; set; }
@@ -98,9 +96,9 @@ namespace Hellscape
             // Check for Collisions against ProposedPosition on Player
             foreach (EntityCollisionSolid solid in MapContainer.CollisionSolids)
             {
-                if (Player.ProposedMask.Intersects(solid.CollisionMask) == true)
+                if (Player.CollisionMask.Intersects(solid.CollisionMask) == true)
                 {
-                    Rectangle _collision = Rectangle.Intersect(Player.ProposedMask, solid.CollisionMask);
+                    Rectangle _collision = Rectangle.Intersect(Player.CollisionMask, solid.CollisionMask);
                     Player.AddCollision(_collision);
                 }
             }

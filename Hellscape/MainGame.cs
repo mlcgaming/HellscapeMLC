@@ -18,14 +18,6 @@ namespace Hellscape
         SpriteBatch spriteBatch;
         WindowState State;
 
-        TiledMap ActiveMap;
-        TiledMapRenderer MapRenderer;
-        Camera2D MapCamera;
-        ActorPlayer Player;
-        MapContainer MapContainer;
-
-        List<EntityCollisionSolid> MapCollisionMasks;
-
         GameController GameController;
 
         public enum WindowState

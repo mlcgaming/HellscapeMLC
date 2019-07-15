@@ -42,8 +42,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
-    <Compile Include="AnimationManager.cs" />
+    <Compile Include="SubSystems\AnimationSystem\Animation.cs" />
+    <Compile Include="SubSystems\AnimationSystem\AnimationManager.cs" />
     <Compile Include="NormalGameplay\ActorPlayer.cs" />
     <Compile Include="NormalGameplay\EntityCollisionSolid.cs" />
     <Compile Include="Global.cs" />
