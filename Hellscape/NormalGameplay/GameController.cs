@@ -24,7 +24,6 @@ namespace Hellscape
         private TiledMap ActiveMap { get; set; }
         private GameMode Mode { get; set; }
         private MapLoadState LoadState { get; set; }
-        private List<EntityCollisionSolid> MapCollisionMasks { get; set; }
         
         enum MapLoadState
         {
@@ -66,9 +65,8 @@ namespace Hellscape
             GameCamera.Position = new Vector2(0, 0);
 
             MapContainer = new MapContainer();
-            ActiveMap = MapContainer.LoadMap("testStageRoom1");
-            MapCollisionMasks = MapContainer.CollisionSolids;
-
+            MapContainer.MapLoaded += OnMapLoad;
+            MapContainer.LoadMap("testStageRoom1");
 
             Mode = GameMode.Normal;
             LoadState = MapLoadState.Preparing;
@@ -102,6 +100,25 @@ namespace Hellscape
                     Player.AddCollision(_collision);
                 }
             }
+
+            if(Player.IsGrounded == true)
+            {
+                Rectangle belowPlayerMask = new Rectangle(Player.CollisionMask.X, Player.CollisionMask.Bottom, Player.CollisionMask.Width, 1);
+
+                foreach (EntityCollisionSolid solid in MapContainer.CollisionSolids)
+                {
+                    if (belowPlayerMask.Intersects(solid.CollisionMask) == true)
+                    {
+                        return;
+                    }
+                }
+
+                Player.PlayerFalling();
+            }
+        }
+        public void OnMapLoad(object source, EventArgs e)
+        {
+            ActiveMap = MapContainer.ActiveMap;
         }
     }
 }

@@ -18,11 +18,13 @@ namespace Hellscape
         public static bool GLOBAL_OPT_FULLSCREEN_ENABLED = false;
         public static bool GLOBAL_CONTROLLER_IS_CONNECTED = true;
         public const float GRAVITY_RATE = 8f;
+        
 
         public static ContentManager Content;
         public static SpriteBatch SpriteBatch;
         public static GraphicsDeviceManager Graphics;
         public static GameWindow Window;
+        public static GameTime GameTime;
         public static Dictionary<string, string> MapAssets = new Dictionary<string, string>();
 
         public static void InitializeDefaults(ContentManager content, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, GameWindow window)
@@ -36,6 +38,7 @@ namespace Hellscape
             SpriteBatch = spriteBatch;
             Graphics = graphics;
             Window = window;
+            GameTime = null;
 
             PopulateMapAssets();
         }
@@ -55,6 +58,10 @@ namespace Hellscape
         public static void SetFullscreen(bool enabled)
         {
             GLOBAL_OPT_FULLSCREEN_ENABLED = enabled;
+        }
+        public static void SetGameTime(GameTime gameTime)
+        {
+            GameTime = gameTime;
         }
         
         public static void PopulateMapAssets()

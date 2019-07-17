@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="8">
+ <properties>
+  <property name="BGMShortname" value="null"/>
+  <property name="ID" value="testStageRoom2"/>
+ </properties>
+ <tileset firstgid="1" source="TestTiles.tsx"/>
+ <layer id="1" name="Background" width="16" height="9">
+  <data encoding="base64">
+   DQAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAADgAAAAUAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAQAAAAFAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAACwAAAAIAAAAEAAAABQAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAA8AAAACAAAABAAAAAUAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAQAAAAMAAAADAAAAAwAAAAQAAAAFAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAQAAAAMAAAADAAAAAwAAAAEAAAABQAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAEAAAADAAAAAwAAAAMAAAAKAAAADAAAAAwAAAAMAAAABAAAAAUAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAAEAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAQAAAAJAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAACgAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAAKAAAA
+  </data>
+ </layer>
+ <objectgroup color="#ff0000" id="2" name="CollisionMasks">
+  <properties>
+   <property name="BGMShortname" value="null"/>
+   <property name="ID" value="testStageRoom2"/>
+  </properties>
+  <object id="1" name="CollisionSolid" x="0" y="0" width="16" height="144"/>
+  <object id="2" name="CollisionSolid" x="16" y="128" width="240" height="16"/>
+  <object id="3" name="CollisionSolid" x="240" y="0" width="16" height="128"/>
+  <object id="4" name="CollisionSolid" x="16" y="0" width="224" height="16"/>
+  <object id="5" name="CollisionSolid" x="176" y="64" width="64" height="64"/>
+  <object id="6" name="CollisionSolid" x="112" y="96" width="64" height="32"/>
+ </objectgroup>
+ <objectgroup color="#ffff00" id="3" name="Transitions">
+  <object id="7" name="TransitionDoor" x="208" y="32" width="16" height="32">
+   <properties>
+    <property name="MapID" value="testStageRoom1"/>
+    <property name="PlayerX" type="int" value="92"/>
+    <property name="PlayerY" type="int" value="104"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

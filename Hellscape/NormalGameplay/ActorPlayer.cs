@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,7 +28,7 @@ namespace Hellscape
         private float RunSpeed;
         private List<Rectangle> Collisions;
         private bool IsColliding;
-        private bool IsGrounded;
+        public bool IsGrounded { get; protected set; }
         private ActorFacing Facing;
         enum ActorFacing
         {
@@ -68,6 +66,10 @@ namespace Hellscape
             LoadContent();
 
             AnimationManager.Play(AnimationLibrary["idle"]);
+
+            InputManager.LeftPressed += OnLeftPress;
+            InputManager.RightPressed += OnRightPress;
+            InputManager.JumpPressed += OnJumpPress;
         }
 
         public void LoadContent()
@@ -79,8 +81,10 @@ namespace Hellscape
         }
         public void Update(GameTime gameTime)
         {
+            Velocity = new Vector2(0, 0);
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            ProcessInput(deltaTime);
+
+            ProcessInput();
 
             if(IsGrounded == false)
             {
@@ -134,43 +138,24 @@ namespace Hellscape
             //spriteBatch.Draw(Sprite, Position, Color.White);
         }
 
-        private void ProcessInput(float deltaTime)
+        private void ProcessInput()
         {
-            Velocity = new Vector2(0, 0);
-            float velocityRate = MoveSpeed * deltaTime;
-
-            if(GamePad.GetState(Controller).IsConnected == true)
+            if(GamePad.GetState(PlayerIndex.One).IsConnected == true)
             {
-                GamePadState gpState = GamePad.GetState(Controller);
+                InputManager.ProcessInputGamePad(PlayerIndex.One);
+            }
+            else
+            {
+                InputManager.ProcessInputKeyboard();
+            }
 
-                float adjustedMoveSpeed = (int)Math.Round(gpState.ThumbSticks.Left.X * velocityRate);
-                Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
-
-                if(IsGrounded == true && gpState.IsButtonDown(Buttons.A) == true)
-                {
-                    float jumpRate = WalkSpeed * deltaTime;
-                    FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 6f));
-                    IsGrounded = false;
-                    AnimationManager.Play(AnimationLibrary["jump"]);
-                }
-
-                if(Velocity.X > 0)
-                {
-                    Facing = ActorFacing.Right;
-                }
-                else if (Velocity.X < 0)
-                {
-                    Facing = ActorFacing.Left;
-                }
-
-                if(gpState.IsButtonDown(Buttons.X) == true)
-                {
-                    MoveSpeed = RunSpeed;
-                }
-                else
-                {
-                    MoveSpeed = WalkSpeed;
-                }
+            if (Velocity.X > 0)
+            {
+                Facing = ActorFacing.Right;
+            }
+            else if (Velocity.X < 0)
+            {
+                Facing = ActorFacing.Left;
             }
         }
 
@@ -252,6 +237,52 @@ namespace Hellscape
 
             adjustPosition = new Vector2(adjustedX, adjustedY);
             ProposedPosition = ProposedPosition + adjustPosition;
+        }
+        public void PlayerFalling()
+        {
+            IsGrounded = false;
+        }
+
+        private void OnLeftPress(object source, MoveInputEventArgs args)
+        {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+            float velocityRate = MoveSpeed * deltaTime;
+            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+            Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+        }
+        private void OnRightPress(object source, MoveInputEventArgs args)
+        {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+            float velocityRate = MoveSpeed * deltaTime;
+            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+            Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+        }
+        private void OnUpPress(object source, MoveInputEventArgs args)
+        {
+
+        }
+        private void OnDownPress(object source, MoveInputEventArgs args)
+        {
+
+        }
+        private void OnJumpPress(object source, EventArgs args)
+        {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+
+            if (IsGrounded == true)
+            {
+                float jumpRate = WalkSpeed * deltaTime;
+                FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 6f));
+                IsGrounded = false;
+                AnimationManager.Play(AnimationLibrary["jump"]);
+            }
+        }
+        private void OnRunPress(object source, EventArgs args)
+        {
+            if(MoveSpeed < RunSpeed)
+            {
+                MoveSpeed = RunSpeed;
+            }
         }
 
         protected virtual void OnPlayerMoved()

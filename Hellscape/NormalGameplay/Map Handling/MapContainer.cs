@@ -15,10 +15,13 @@ namespace Hellscape
 {
     public class MapContainer
     {
-        private string MapID { get; set; }
-        private TiledMap ActiveMap { get; set; }
-        private TiledMap MapToLoad { get; set; }
-        private ContentManager Content { get; set; }
+        public delegate void MapLoadedEventHandler(object source, EventArgs e);
+        public event MapLoadedEventHandler MapLoaded;
+
+        public string MapID { get; protected set; }
+        public TiledMap ActiveMap { get; protected set; }
+        private TiledMap MapToLoad;
+        private ContentManager Content;
         public List<EntityCollisionSolid> CollisionSolids { get; protected set; }
 
         public MapContainer()
@@ -31,22 +34,13 @@ namespace Hellscape
 
             CollisionSolids = new List<EntityCollisionSolid>();
         }
-        public MapContainer(ContentManager content)
-        {
-            Content = content;
-
-            MapID = "";
-            ActiveMap = null;
-
-            CollisionSolids = new List<EntityCollisionSolid>();
-        }
 
         /// <summary>
         /// Loads TiledMap into memory, releasing old CollisionMasks, if present
         /// </summary>
         /// <param name="mapID">ID of Map to Load</param>
         /// <returns></returns>
-        public TiledMap LoadMap(string mapID)
+        public void LoadMap(string mapID)
         {
             if(CollisionSolids.Count > 0)
             {
@@ -59,7 +53,7 @@ namespace Hellscape
             MapID = mapID;
             string assetPath = Global.GetMapAssetPathByID(MapID);
             MapToLoad = Content.Load<TiledMap>(assetPath);
-            TiledMapObjectLayer collisionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("SceneObjects");
+            TiledMapObjectLayer collisionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("CollisionMasks");
             foreach (TiledMapObject _sceneObject in collisionLayer.Objects)
             {
                 switch (_sceneObject.Name)
@@ -73,7 +67,12 @@ namespace Hellscape
                 }
             }
             ActiveMap = MapToLoad;
-            return ActiveMap;
+            OnMapLoaded();
+        }
+
+        protected virtual void OnMapLoaded()
+        {
+            MapLoaded?.Invoke(this, EventArgs.Empty);
         }
     }
 }
