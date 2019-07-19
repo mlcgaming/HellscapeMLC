@@ -15,14 +15,14 @@ namespace Hellscape
 {
     public class MapContainer
     {
-        public delegate void MapLoadedEventHandler(object source, EventArgs e);
-        public event MapLoadedEventHandler MapLoaded;
+        public event EventHandler MapLoaded;
 
         public string MapID { get; protected set; }
         public TiledMap ActiveMap { get; protected set; }
         private TiledMap MapToLoad;
         private ContentManager Content;
         public List<EntityCollisionSolid> CollisionSolids { get; protected set; }
+        public List<TileEntitySceneObject> TileSceneObjects { get; protected set; }
 
         public MapContainer()
         {
@@ -67,7 +67,31 @@ namespace Hellscape
                 }
             }
             ActiveMap = MapToLoad;
+
+            SceneObjectLoader loader = new SceneObjectLoader();
+            TileSceneObjects = new List<TileEntitySceneObject>(loader.LoadSceneObjects(mapID));
+
             OnMapLoaded();
+        }
+        public void Update()
+        {
+            if(TileSceneObjects.Count > 0)
+            {
+                foreach(TileEntitySceneObject o in TileSceneObjects)
+                {
+                    o.Update();
+                }
+            }
+        }
+        public void Draw()
+        {
+            if (TileSceneObjects.Count > 0)
+            {
+                foreach (TileEntitySceneObject o in TileSceneObjects)
+                {
+                    o.Draw();
+                }
+            }
         }
 
         protected virtual void OnMapLoaded()

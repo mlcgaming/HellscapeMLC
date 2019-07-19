@@ -21,7 +21,8 @@ namespace Hellscape
         private Camera2D GameCamera { get; set; }
         private BoxingViewportAdapter GameViewport { get; set; }
         private TiledMapRenderer MapRenderer { get; set; }
-        private TiledMap ActiveMap { get; set; }
+        //private TiledMap ActiveMap { get; set; }
+        private List<TileEntitySceneObject> SceneObjects { get; set; }
         private GameMode Mode { get; set; }
         private MapLoadState LoadState { get; set; }
         
@@ -49,6 +50,9 @@ namespace Hellscape
 
         private void Initialize()
         {
+            LoadState = MapLoadState.Preparing;
+            Mode = GameMode.Paused;
+
             Content = Global.Content;
 
             MapContainer = new MapContainer();
@@ -64,29 +68,87 @@ namespace Hellscape
             GameCamera.Origin = new Vector2(0, 0);
             GameCamera.Position = new Vector2(0, 0);
 
+            SceneObjects = new List<TileEntitySceneObject>();
+
             MapContainer = new MapContainer();
             MapContainer.MapLoaded += OnMapLoad;
-            MapContainer.LoadMap("testStageRoom1");
-
-            Mode = GameMode.Normal;
-            LoadState = MapLoadState.Preparing;
+            MapContainer.LoadMap("DebugRoom1");
         }
 
         public void Update(GameTime gameTime)
         {
-            MapRenderer.Update(ActiveMap, gameTime);
-            Player.Update(gameTime);
+            switch (LoadState)
+            {
+                case MapLoadState.Preparing:
+                    {
+
+                        break;
+                    }
+
+                case MapLoadState.Loaded:
+                    {
+                        switch (Mode)
+                        {
+                            case GameMode.Normal:
+                                {
+                                    MapRenderer.Update(MapContainer.ActiveMap, gameTime);
+                                    MapContainer.Update();
+                                    Player.Update(gameTime);
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+
+                case MapLoadState.Clearing:
+                    {
+
+                        break;
+                    }
+                case MapLoadState.Debug:
+                    {
+
+                        break;
+                    }
+            }
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw()
         {
-            var transformMatrix = GameCamera.GetViewMatrix();
+            switch (LoadState)
+            {
+                case MapLoadState.Preparing:
+                    {
 
-            spriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+                        break;
+                    }
 
-            MapRenderer.Draw(ActiveMap, GameCamera.GetViewMatrix());
-            Player.Draw(spriteBatch);
+                case MapLoadState.Loaded:
+                    {
+                        var transformMatrix = GameCamera.GetViewMatrix();
 
-            spriteBatch.End();
+                        Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+
+                        MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
+                        MapContainer.Draw();
+                        Player.Draw();
+
+                        Global.SpriteBatch.End();
+                        break;
+                    }
+
+                case MapLoadState.Clearing:
+                    {
+
+                        break;
+                    }
+                case MapLoadState.Debug:
+                    {
+
+                        break;
+                    }
+            }
+
+            
         }
 
         public void OnPlayerMove(object source, EventArgs e)
@@ -118,7 +180,8 @@ namespace Hellscape
         }
         public void OnMapLoad(object source, EventArgs e)
         {
-            ActiveMap = MapContainer.ActiveMap;
+            LoadState = MapLoadState.Loaded;
+            Mode = GameMode.Normal;
         }
     }
 }

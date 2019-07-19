@@ -70,6 +70,7 @@ namespace Hellscape
             InputManager.LeftPressed += OnLeftPress;
             InputManager.RightPressed += OnRightPress;
             InputManager.JumpPressed += OnJumpPress;
+            InputManager.RunPressed += OnRunPress;
         }
 
         public void LoadContent()
@@ -124,15 +125,15 @@ namespace Hellscape
 
             AnimationManager.Update(gameTime);
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw()
         {
             if(Facing == ActorFacing.Right)
             {
-                AnimationManager.Draw(spriteBatch, CollisionMask, SpriteEffects.None);
+                AnimationManager.Draw(CollisionMask, SpriteEffects.None);
             }
             else
             {
-                AnimationManager.Draw(spriteBatch, CollisionMask, SpriteEffects.FlipHorizontally);
+                AnimationManager.Draw(CollisionMask, SpriteEffects.FlipHorizontally);
             }
             
             //spriteBatch.Draw(Sprite, Position, Color.White);

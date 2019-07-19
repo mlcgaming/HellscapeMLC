@@ -43,11 +43,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InputManager.cs" />
-    <Compile Include="NormalGameplay\EntitySceneObject.cs" />
+    <Compile Include="NormalGameplay\Map Handling\MapLoaderSceneObject.cs" />
+    <Compile Include="NormalGameplay\SceneObject.cs" />
+    <Compile Include="NormalGameplay\Map Handling\TileEntitySceneObject.cs" />
+    <Compile Include="NormalGameplay\Map Handling\SceneObjectLoader.cs" />
     <Compile Include="SubSystems\AnimationSystem\Animation.cs" />
     <Compile Include="SubSystems\AnimationSystem\AnimationManager.cs" />
     <Compile Include="NormalGameplay\ActorPlayer.cs" />
-    <Compile Include="NormalGameplay\EntityCollisionSolid.cs" />
+    <Compile Include="NormalGameplay\Map Handling\EntityCollisionSolid.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="NormalGameplay\GameController.cs" />

@@ -23,9 +23,8 @@ namespace Hellscape
         {
             if (animation == null)
             {
-                //throw new AnimationNotFoundException(animationReference);
+                return;
             }
-
             if (Animation == animation)
             {
                 return;
@@ -52,16 +51,16 @@ namespace Hellscape
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position)
+        public void Draw(Vector2 position)
         {
-            spriteBatch.Draw(Animation.Texture, position,
+            Global.SpriteBatch.Draw(Animation.Texture, position,
                 new Rectangle((int)Animation.FrameStartPosition.X + (Animation.CurrentFrame * Animation.FrameWidth),
                 (int)Animation.FrameStartPosition.Y, Animation.FrameWidth, Animation.FrameHeight),
                 Color.White);
         }
-        public void Draw(SpriteBatch spriteBatch, Rectangle rectangle, SpriteEffects effects)
+        public void Draw(Rectangle rectangle, SpriteEffects effects)
         {
-            spriteBatch.Draw(Animation.Texture, rectangle,
+            Global.SpriteBatch.Draw(Animation.Texture, rectangle,
                 new Rectangle((int)Animation.FrameStartPosition.X + (Animation.CurrentFrame * Animation.FrameWidth),
                 (int)Animation.FrameStartPosition.Y, Animation.FrameWidth, Animation.FrameHeight),
                 Color.White, 0f, new Vector2(0), effects, 0f);

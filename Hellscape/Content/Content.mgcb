@@ -15,10 +15,15 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Data/maps/TestMap.tmx
+#begin Data/maps/DebugRoom1.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
-/build:Data/maps/TestMap.tmx
+/build:Data/maps/DebugRoom1.tmx
+
+#begin Data/maps/DebugRoom2.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom2.tmx
 
 #begin Data/maps/TileSet.png
 /importer:TextureImporter

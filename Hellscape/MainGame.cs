@@ -6,6 +6,9 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Graphics;
 using MonoGame.Extended.ViewportAdapters;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Hellscape
 {
@@ -34,6 +37,7 @@ namespace Hellscape
 
         protected override void Initialize()
         {
+            LoadContent();
             Global.InitializeDefaults(Content, spriteBatch, graphics, Window);
 
             graphics.PreferredBackBufferWidth = (int)Global.GLOBAL_OPT_WINDOW_SIZE.X;
@@ -87,7 +91,7 @@ namespace Hellscape
                     }
                 case WindowState.NormalPlay:
                     {
-                        GameController.Draw(spriteBatch);
+                        GameController.Draw();
                         break;
                     }
             }

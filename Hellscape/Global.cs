@@ -26,6 +26,7 @@ namespace Hellscape
         public static GameWindow Window;
         public static GameTime GameTime;
         public static Dictionary<string, string> MapAssets = new Dictionary<string, string>();
+        public static List<SceneObject> SceneObjects = new List<SceneObject>();
 
         public static void InitializeDefaults(ContentManager content, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, GameWindow window)
         {
@@ -41,6 +42,7 @@ namespace Hellscape
             GameTime = null;
 
             PopulateMapAssets();
+            PopulateSceneObjects();
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
         {
@@ -63,15 +65,32 @@ namespace Hellscape
         {
             GameTime = gameTime;
         }
-        
+
         public static void PopulateMapAssets()
         {
-            MapAssets.Add("testStageRoom1", "Data/maps/TestMap");
+            MapAssets.Add("DebugRoom1", "Data/maps/DebugRoom1");
+        }
+        public static void PopulateSceneObjects()
+        {
+            SceneObject goldKey = new SceneObject("soKeyGold", "Gold Key", 1, new Animation(Content.Load<Texture2D>("Data/maps/TileSet"), 1, 16, 16, 0f, new Vector2(32, 16)));
+            SceneObjects.Add(goldKey);
         }
 
         public static string GetMapAssetPathByID(string mapID)
         {
             return MapAssets[mapID];
+        }
+        public static SceneObject GetSceneObjectBYID(string shortName)
+        {
+            foreach(SceneObject so in SceneObjects)
+            {
+                if(so.ShortName == shortName)
+                {
+                    return so;
+                }
+            }
+
+            return null;
         }
     }
 }
