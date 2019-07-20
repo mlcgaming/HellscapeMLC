@@ -2,11 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Hellscape
 {
@@ -21,15 +17,18 @@ namespace Hellscape
 
         public List<TileEntitySceneObject> LoadSceneObjects(string mapID)
         {
-            string mapJson = File.ReadAllText(Global.Content.RootDirectory + "..\\..\\..\\..\\..\\..\\..\\..\\Hellscape\\Hellscape\\Content\\Data\\maps\\SceneObjects\\" + mapID + ".json");
+            string mapJson = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001/" + mapID + ".json");
             List<MapLoaderSceneObject> mapObjects = JsonConvert.DeserializeObject<List<MapLoaderSceneObject>>(mapJson);
 
-            foreach (MapLoaderSceneObject o in mapObjects)
+            if(mapJson != "")
             {
-                TileEntitySceneObject newTileObject = new TileEntitySceneObject(o);
-                SceneObjects.Add(newTileObject);
+                foreach (MapLoaderSceneObject o in mapObjects)
+                {
+                    TileEntitySceneObject newTileObject = new TileEntitySceneObject(o);
+                    SceneObjects.Add(newTileObject);
+                }
             }
-
+            
             return SceneObjects;
         }
         public void SaveSceneObjects(string mapID, List<TileEntitySceneObject> tileSceneObjects)
@@ -48,7 +47,11 @@ namespace Hellscape
                 }
 
                 string jsonSaveString = JsonConvert.SerializeObject(mapObjects, Formatting.Indented);
-                File.WriteAllText(Global.Content.RootDirectory + "..\\..\\..\\..\\..\\..\\..\\..\\Hellscape\\Hellscape\\Content\\Data\\maps\\SceneObjects\\" + mapID + ".json", jsonSaveString);
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001/" + mapID + ".json", jsonSaveString);
+            }
+            else
+            {
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001/" + mapID + ".json", "");
             }
         }
     }

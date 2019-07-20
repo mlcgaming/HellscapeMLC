@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -22,6 +19,7 @@ namespace Hellscape
         public static event EventHandler JumpPressed;
         public static event EventHandler RunPressed;
         public static event EventHandler RunReleased;
+        public static event EventHandler InventoryPressed;
         public static event EventHandler StartPressed;
 
         public static Dictionary<Keys, bool> KeysPressed = new Dictionary<Keys, bool>();
@@ -33,6 +31,7 @@ namespace Hellscape
         public static void Initialize()
         {
             KeysPressed.Add(Keys.E, false);
+            KeysPressed.Add(Keys.I, false);
             KeysPressed.Add(Keys.Space, false);
             KeysPressed.Add(Keys.LeftShift, false);
             KeysPressed.Add(Keys.Escape, false);
@@ -40,6 +39,7 @@ namespace Hellscape
             ButtonsPressed.Add(Buttons.A, false);
             ButtonsPressed.Add(Buttons.B, false);
             ButtonsPressed.Add(Buttons.X, false);
+            ButtonsPressed.Add(Buttons.Y, false);
             ButtonsPressed.Add(Buttons.Start, false);
         }
         public static void ProcessInputKeyboard()
@@ -107,6 +107,7 @@ namespace Hellscape
                         OnMovedDown(GPState.ThumbSticks.Left.Y);
                     }
                 }
+
                 if(GPState.IsButtonDown(Buttons.B) == true)
                 {
                     if (ButtonsPressed[Buttons.B] == false)
@@ -122,6 +123,7 @@ namespace Hellscape
                         ButtonsPressed[Buttons.B] = false;
                     }
                 }
+
                 if (GPState.IsButtonDown(Buttons.A) == true)
                 {
                     if (ButtonsPressed[Buttons.A] == false)
@@ -137,6 +139,7 @@ namespace Hellscape
                         ButtonsPressed[Buttons.A] = false;
                     }
                 }
+
                 if (GPState.IsButtonDown(Buttons.X) == true)
                 {
                     if(ButtonsPressed[Buttons.X] == false)
@@ -153,6 +156,7 @@ namespace Hellscape
                         OnRunReleased();
                     }
                 }
+
                 if (GPState.IsButtonDown(Buttons.Start) == true)
                 {
                     if (ButtonsPressed[Buttons.Start] == false)

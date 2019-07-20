@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Hellscape
 {
@@ -40,6 +39,8 @@ namespace Hellscape
         private AnimationManager AnimationManager;
         private Dictionary<string, Animation> AnimationLibrary;
 
+        public ActorInventory Inventory { get; private set; }
+
         public ActorPlayer(int id, PlayerIndex controller, Vector2 position)
         {
             ID = id;
@@ -67,6 +68,8 @@ namespace Hellscape
             LoadContent();
 
             AnimationManager.Play(AnimationLibrary["idle"]);
+
+            Inventory = new ActorInventory();
 
             InputManager.LeftPressed += OnLeftPress;
             InputManager.RightPressed += OnRightPress;
@@ -204,10 +207,13 @@ namespace Hellscape
                 // Process Collision VERTICALLY
                 if (ProposedPosition.Y + 12 < collisionMask.Y)
                 {
-                    adjustedY = -(collisionMask.Height);
-                    IsGrounded = true;
-                    FallVector = new Vector2(0);
-                    AnimationManager.Play(AnimationLibrary["idle"]);
+                    if(FallVector.Y >= 0)
+                    {
+                        adjustedY = -(collisionMask.Height);
+                        IsGrounded = true;
+                        FallVector = new Vector2(0);
+                        AnimationManager.Play(AnimationLibrary["idle"]);
+                    }
                 }
                 else
                 {
@@ -258,6 +264,11 @@ namespace Hellscape
             float velocityRate = MoveSpeed * deltaTime;
             float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
             Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+            if(AnimationManager.Animation != AnimationLibrary["idle"])
+            {
+                AnimationManager.Play(AnimationLibrary["idle"]);
+            }
         }
         private void OnRightPress(object source, MoveInputEventArgs args)
         {
@@ -265,6 +276,11 @@ namespace Hellscape
             float velocityRate = MoveSpeed * deltaTime;
             float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
             Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+            if (AnimationManager.Animation != AnimationLibrary["idle"])
+            {
+                AnimationManager.Play(AnimationLibrary["idle"]);
+            }
         }
         private void OnUpPress(object source, MoveInputEventArgs args)
         {

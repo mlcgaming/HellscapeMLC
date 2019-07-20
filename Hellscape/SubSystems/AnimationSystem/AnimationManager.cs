@@ -11,7 +11,7 @@ namespace Hellscape
 {
     public class AnimationManager
     {
-        private Animation Animation;
+        public Animation Animation { get; private set; }
         private float FrameTimer;
 
         public AnimationManager()

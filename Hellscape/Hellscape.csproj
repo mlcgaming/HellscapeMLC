@@ -42,17 +42,20 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="InputManager.cs" />
+    <Compile Include="Reference Classes\InputManager.cs" />
+    <Compile Include="NormalGameplay\Map Handling\TileSceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\MapLoaderSceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\TransitionHandler.cs" />
-    <Compile Include="NormalGameplay\SceneObject.cs" />
+    <Compile Include="NormalGameplay\Player Handling\ActorInventory.cs" />
+    <Compile Include="NormalGameplay\Player Handling\InventoryItem.cs" />
+    <Compile Include="Reference Classes\SceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\TileEntitySceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\SceneObjectLoader.cs" />
     <Compile Include="SubSystems\AnimationSystem\Animation.cs" />
     <Compile Include="SubSystems\AnimationSystem\AnimationManager.cs" />
-    <Compile Include="NormalGameplay\ActorPlayer.cs" />
+    <Compile Include="NormalGameplay\Player Handling\ActorPlayer.cs" />
     <Compile Include="NormalGameplay\Map Handling\EntityCollisionSolid.cs" />
-    <Compile Include="Global.cs" />
+    <Compile Include="Reference Classes\Global.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="NormalGameplay\GameController.cs" />
     <Compile Include="NormalGameplay\Map Handling\MapContainer.cs" />

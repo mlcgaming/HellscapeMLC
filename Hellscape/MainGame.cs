@@ -1,14 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Graphics;
-using MonoGame.Extended.ViewportAdapters;
-using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System;
 
 namespace Hellscape
 {
@@ -37,6 +31,11 @@ namespace Hellscape
 
         protected override void Initialize()
         {
+            if(Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug") == false)
+            {
+                SetupAppData();
+            }
+
             LoadContent();
             Global.InitializeDefaults(Content, spriteBatch, graphics, Window);
             InputManager.Initialize();
@@ -98,6 +97,15 @@ namespace Hellscape
             }
 
             base.Draw(gameTime);
+        }
+
+        private void SetupAppData()
+        {
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug");
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/bin");
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/data");
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save");
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001");
         }
     }
 }

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -25,7 +20,7 @@ namespace Hellscape
         public static GraphicsDeviceManager Graphics;
         public static GameWindow Window;
         public static GameTime GameTime;
-        public static Dictionary<string, string> MapAssets = new Dictionary<string, string>();
+        public static Dictionary<string, bool> DoorTriggers = new Dictionary<string, bool>();
         public static List<SceneObject> SceneObjects = new List<SceneObject>();
 
         public static void InitializeDefaults(ContentManager content, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, GameWindow window)
@@ -41,7 +36,7 @@ namespace Hellscape
             Window = window;
             GameTime = null;
 
-            PopulateMapAssets();
+            PopulateDoorTriggers();
             PopulateSceneObjects();
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
@@ -66,20 +61,22 @@ namespace Hellscape
             GameTime = gameTime;
         }
 
-        public static void PopulateMapAssets()
+        public static void PopulateDoorTriggers()
         {
-            MapAssets.Add("DebugRoom1", "Data/maps/DebugRoom1");
-            MapAssets.Add("DebugRoom2", "Data/maps/DebugRoom2");
+            DoorTriggers.Add("DebugRoom1", false);
         }
         public static void PopulateSceneObjects()
         {
-            SceneObject goldKey = new SceneObject("soKeyGold", "Gold Key", 1, new Animation(Content.Load<Texture2D>("Data/maps/TileSet"), 1, 16, 16, 0f, new Vector2(32, 16)));
+            SceneObject goldKey = new SceneObject("soKeyGold", "Gold Key", 1, new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(0, 0)));
             SceneObjects.Add(goldKey);
+
+            SceneObject silverKey = new SceneObject("soKeySilver", "Silver Key", 1, new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(16, 0)));
+            SceneObjects.Add(silverKey);
         }
 
         public static string GetMapAssetPathByID(string mapID)
         {
-            return MapAssets[mapID];
+            return "Data/maps/" + mapID;
         }
         public static SceneObject GetSceneObjectBYID(string shortName)
         {

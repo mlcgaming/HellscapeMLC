@@ -1,17 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
-using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Graphics;
-using Newtonsoft.Json;
 
 namespace Hellscape
 {
@@ -95,6 +85,20 @@ namespace Hellscape
                             TransitionHandlers.Add(transition);
                             break;
                         }
+                    case "TransitionDoorLocked":
+                        {
+                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                            if(_transition.Properties["LockType"] == "Key")
+                            {
+                                transition.LockWithKey(Global.GetSceneObjectBYID(_transition.Properties["KeyShortname"]), int.Parse(_transition.Properties["KeyQuantity"]));
+                            }
+                            if (_transition.Properties["LockType"] == "Trigger")
+                            {
+                                transition.LockWithTrigger(_transition.Properties["TriggerKey"]);
+                            }
+                            TransitionHandlers.Add(transition);
+                            break;
+                        }
                 }
             }
 
@@ -122,6 +126,11 @@ namespace Hellscape
                     o.Draw();
                 }
             }
+        }
+
+        public void RemoveTileSceneObject(TileEntitySceneObject obj)
+        {
+            TileSceneObjects.Remove(obj);
         }
 
         protected virtual void OnMapLoaded()

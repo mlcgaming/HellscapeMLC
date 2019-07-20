@@ -1,14 +1,8 @@
 [
-  {
-    "ShortName": "soKeyGold",
-    "MapX": 96.0,
-    "MapY": 96.0,
-    "Quantity": 1
-  },
-  {
-    "ShortName": "soKeyGold",
-    "MapX": 160.0,
-    "MapY": 112.0,
-    "Quantity": 1
-  }
-]
+    {
+      "ShortName": "soKeyGold",
+      "MapX": 96.0,
+      "MapY": 96.0,
+      "Quantity": 1
+    }
+  ]

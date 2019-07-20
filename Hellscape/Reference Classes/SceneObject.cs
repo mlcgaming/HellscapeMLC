@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-
-namespace Hellscape
+﻿namespace Hellscape
 {
     /// <summary>
     /// SceneObjects are the most basic form of inventory items. They are stripped down and used as reference in the Global codex.
