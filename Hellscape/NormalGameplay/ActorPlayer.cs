@@ -13,6 +13,7 @@ namespace Hellscape
     {
         public delegate void PlayerMoveEventHandler(object source, EventArgs e);
         public event PlayerMoveEventHandler PlayerMoved;
+        public event EventHandler PlayerInteracted;
 
         public int ID { get; protected set; }
         public PlayerIndex Controller { get; protected set; }
@@ -71,6 +72,8 @@ namespace Hellscape
             InputManager.RightPressed += OnRightPress;
             InputManager.JumpPressed += OnJumpPress;
             InputManager.RunPressed += OnRunPress;
+            InputManager.RunReleased += OnRunRelease;
+            InputManager.InteractPressed += OnInteractPress;
         }
 
         public void LoadContent()
@@ -243,6 +246,11 @@ namespace Hellscape
         {
             IsGrounded = false;
         }
+        public void Move(Vector2 position)
+        {
+            Position = position;
+            CreateCollisionMask(Position, 16, 24);
+        }
 
         private void OnLeftPress(object source, MoveInputEventArgs args)
         {
@@ -266,6 +274,10 @@ namespace Hellscape
         {
 
         }
+        private void OnInteractPress(object source, EventArgs args)
+        {
+            PlayerInteracted?.Invoke(this, EventArgs.Empty);
+        }
         private void OnJumpPress(object source, EventArgs args)
         {
             float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
@@ -285,10 +297,21 @@ namespace Hellscape
                 MoveSpeed = RunSpeed;
             }
         }
+        private void OnRunRelease(object source, EventArgs args)
+        {
+            if (MoveSpeed == RunSpeed)
+            {
+                MoveSpeed = WalkSpeed;
+            }
+        }
 
         protected virtual void OnPlayerMoved()
         {
             PlayerMoved?.Invoke(this, EventArgs.Empty);
+        }
+        protected virtual void OnPlayerInteracted()
+        {
+            PlayerInteracted?.Invoke(this, EventArgs.Empty);
         }
     }
 }

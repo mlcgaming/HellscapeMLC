@@ -61,6 +61,13 @@
 /processorParam:TextureFormat=Color
 /build:GFX/Characters/MainCharacterTemplate.png
 
+#begin GFX/Fonts/PauseFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:GFX/Fonts/PauseFont.spritefont
+
 #begin GFX/Portraits/PlaceholderCharacterPortrait.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,6 +79,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:GFX/Portraits/PlaceholderCharacterPortrait.png
+
+#begin GFX/SinglePixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GFX/SinglePixel.png
 
 #begin GFX/SkillIcons/HealingSkill.png
 /importer:TextureImporter

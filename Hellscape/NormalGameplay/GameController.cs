@@ -57,8 +57,11 @@ namespace Hellscape
 
             MapContainer = new MapContainer();
 
+            InputManager.StartPressed += OnStartPressed;
+
             Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(112, 104));
             Player.PlayerMoved += OnPlayerMove;
+            Player.PlayerInteracted += OnPlayerInteract;
 
             MapRenderer = new TiledMapRenderer(Global.Graphics.GraphicsDevice);
 
@@ -96,6 +99,12 @@ namespace Hellscape
                                     Player.Update(gameTime);
                                     break;
                                 }
+                            case GameMode.Paused:
+                                {
+                                    InputManager.ProcessInputGamePad(PlayerIndex.One);
+
+                                    break;
+                                }
                         }
                         break;
                     }
@@ -126,13 +135,36 @@ namespace Hellscape
                     {
                         var transformMatrix = GameCamera.GetViewMatrix();
 
-                        Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+                        switch (Mode)
+                        {
+                            case GameMode.Normal:
+                                {
+                                    Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
 
-                        MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
-                        MapContainer.Draw();
-                        Player.Draw();
+                                    MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
+                                    MapContainer.Draw();
+                                    Player.Draw();
 
-                        Global.SpriteBatch.End();
+                                    Global.SpriteBatch.End();
+
+                                    break;
+                                }
+                            case GameMode.Paused:
+                                {
+                                    Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+
+                                    MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
+                                    MapContainer.Draw();
+                                    Player.Draw();
+
+                                    Global.SpriteBatch.Draw(Content.Load<Texture2D>("GFX/SinglePixel"), (Rectangle)GameCamera.BoundingRectangle, Color.Black * 0.5f);
+                                    Global.SpriteBatch.DrawString(Content.Load<SpriteFont>("GFX/Fonts/PauseFont"), "PAUSED", GameCamera.Position + new Vector2(96, 64), Color.White);
+
+                                    Global.SpriteBatch.End();
+
+                                    break;
+                                }
+                        }
                         break;
                     }
 
@@ -151,6 +183,17 @@ namespace Hellscape
             
         }
 
+        private void OnStartPressed(object source, EventArgs args)
+        {
+            if(Mode == GameMode.Paused)
+            {
+                Mode = GameMode.Normal;
+            }
+            else
+            {
+                Mode = GameMode.Paused;
+            }
+        }
         public void OnPlayerMove(object source, EventArgs e)
         {
             // Check for Collisions against ProposedPosition on Player
@@ -176,6 +219,18 @@ namespace Hellscape
                 }
 
                 Player.PlayerFalling();
+            }
+        }
+        private void OnPlayerInteract(object source, EventArgs args)
+        {
+            foreach(TransitionHandler t in MapContainer.TransitionHandlers)
+            {
+                if(t.CollisionMask.Intersects(Player.CollisionMask) == true)
+                {
+                    Player.Move(t.TransitionPosition);
+                    MapContainer.LoadMap(t.TransitionMapID);
+                    return;
+                }
             }
         }
         public void OnMapLoad(object source, EventArgs e)

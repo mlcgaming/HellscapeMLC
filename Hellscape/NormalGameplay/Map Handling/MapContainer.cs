@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Graphics;
+using Newtonsoft.Json;
 
 namespace Hellscape
 {
@@ -22,6 +24,7 @@ namespace Hellscape
         private TiledMap MapToLoad;
         private ContentManager Content;
         public List<EntityCollisionSolid> CollisionSolids { get; protected set; }
+        public List<TransitionHandler> TransitionHandlers { get; protected set; }
         public List<TileEntitySceneObject> TileSceneObjects { get; protected set; }
 
         public MapContainer()
@@ -33,6 +36,7 @@ namespace Hellscape
             MapToLoad = null;
 
             CollisionSolids = new List<EntityCollisionSolid>();
+            TransitionHandlers = new List<TransitionHandler>();
         }
 
         /// <summary>
@@ -42,6 +46,13 @@ namespace Hellscape
         /// <returns></returns>
         public void LoadMap(string mapID)
         {
+            SceneObjectLoader loader = new SceneObjectLoader();
+
+            if (ActiveMap != null)
+            {
+                loader.SaveSceneObjects(MapID, TileSceneObjects);
+            }
+
             if(CollisionSolids.Count > 0)
             {
                 for(int i = CollisionSolids.Count - 1; i >= 0; i--)
@@ -49,11 +60,19 @@ namespace Hellscape
                     CollisionSolids.RemoveAt(i);
                 }
             }
+            if(TransitionHandlers.Count > 0)
+            {
+                for(int i = TransitionHandlers.Count - 1; i >= 0; i--)
+                {
+                    TransitionHandlers.RemoveAt(i);
+                }
+            }
 
             MapID = mapID;
             string assetPath = Global.GetMapAssetPathByID(MapID);
             MapToLoad = Content.Load<TiledMap>(assetPath);
             TiledMapObjectLayer collisionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("CollisionMasks");
+            TiledMapObjectLayer transitionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("Transitions");
             foreach (TiledMapObject _sceneObject in collisionLayer.Objects)
             {
                 switch (_sceneObject.Name)
@@ -66,9 +85,20 @@ namespace Hellscape
                         }
                 }
             }
-            ActiveMap = MapToLoad;
+            foreach(TiledMapObject _transition in transitionLayer.Objects)
+            {
+                switch (_transition.Name)
+                {
+                    case "TransitionDoor":
+                        {
+                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                            TransitionHandlers.Add(transition);
+                            break;
+                        }
+                }
+            }
 
-            SceneObjectLoader loader = new SceneObjectLoader();
+            ActiveMap = MapToLoad;
             TileSceneObjects = new List<TileEntitySceneObject>(loader.LoadSceneObjects(mapID));
 
             OnMapLoaded();

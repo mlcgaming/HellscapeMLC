@@ -39,6 +39,7 @@ namespace Hellscape
         {
             LoadContent();
             Global.InitializeDefaults(Content, spriteBatch, graphics, Window);
+            InputManager.Initialize();
 
             graphics.PreferredBackBufferWidth = (int)Global.GLOBAL_OPT_WINDOW_SIZE.X;
             graphics.PreferredBackBufferHeight = (int)Global.GLOBAL_OPT_WINDOW_SIZE.Y;

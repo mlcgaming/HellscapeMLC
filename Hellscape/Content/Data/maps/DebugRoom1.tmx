@@ -28,7 +28,7 @@
  <objectgroup color="#ffff00" id="6" name="Transitions">
   <object id="13" name="TransitionDoor" x="192" y="96" width="16" height="32">
    <properties>
-    <property name="MapID" value="testStageRoom2"/>
+    <property name="MapID" value="DebugRoom2"/>
     <property name="PlayerX" type="int" value="208"/>
     <property name="PlayerY" type="int" value="40"/>
    </properties>

@@ -69,6 +69,7 @@ namespace Hellscape
         public static void PopulateMapAssets()
         {
             MapAssets.Add("DebugRoom1", "Data/maps/DebugRoom1");
+            MapAssets.Add("DebugRoom2", "Data/maps/DebugRoom2");
         }
         public static void PopulateSceneObjects()
         {
