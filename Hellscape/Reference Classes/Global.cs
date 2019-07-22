@@ -23,6 +23,8 @@ namespace Hellscape
         public static Dictionary<string, bool> DoorTriggers = new Dictionary<string, bool>();
         public static List<SceneObject> SceneObjects = new List<SceneObject>();
 
+        public static bool IsNetworkGame;
+
         public static void InitializeDefaults(ContentManager content, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, GameWindow window)
         {
             GLOBAL_OPT_BGM_VOLUME = 1.0f;
@@ -35,6 +37,8 @@ namespace Hellscape
             Graphics = graphics;
             Window = window;
             GameTime = null;
+
+            IsNetworkGame = false;
 
             PopulateDoorTriggers();
             PopulateSceneObjects();

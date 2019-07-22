@@ -15,6 +15,7 @@ namespace Hellscape
         SpriteBatch spriteBatch;
         WindowState State;
 
+        MainMenuController MainMenu;
         GameController GameController;
 
         public enum WindowState
@@ -45,9 +46,12 @@ namespace Hellscape
             graphics.IsFullScreen = Global.GLOBAL_OPT_FULLSCREEN_ENABLED;
             graphics.ApplyChanges();
 
-            GameController = new GameController();
+            MainMenu = new MainMenuController();
 
-            State = WindowState.NormalPlay;
+            MainMenu.GameStarted += OnGameStarted;
+            MainMenu.GameExited += OnGameExited;
+
+            State = WindowState.MainMenu;
 
             base.Initialize();
         }
@@ -57,21 +61,18 @@ namespace Hellscape
         }
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             Global.SetGameTime(gameTime);
 
             switch (State)
             {
                 case WindowState.MainMenu:
                     {
-
+                        MainMenu.Update();
                         break;
                     }
                 case WindowState.NormalPlay:
                     {
-                        GameController.Update(gameTime);
+                        GameController.Update();
                         break;
                     }
             }
@@ -86,7 +87,7 @@ namespace Hellscape
             {
                 case WindowState.MainMenu:
                     {
-
+                        MainMenu.Draw();
                         break;
                     }
                 case WindowState.NormalPlay:
@@ -106,6 +107,20 @@ namespace Hellscape
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/data");
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save");
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001");
+        }
+
+        private void OnGameStarted(object source, EventArgs args)
+        {
+            GameController = new GameController();
+            State = WindowState.NormalPlay;
+
+            MainMenu.Dispose();
+            MainMenu.GameStarted -= OnGameStarted;
+            MainMenu = null;
+        }
+        private void OnGameExited(object source, EventArgs args)
+        {
+            Exit();
         }
     }
 }

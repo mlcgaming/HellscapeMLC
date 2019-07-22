@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Tiled;
+using MonoGame.Extended;
 
 namespace Hellscape
 {

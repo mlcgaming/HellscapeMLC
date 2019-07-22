@@ -68,7 +68,7 @@ namespace Hellscape
 
             MapRenderer = new TiledMapRenderer(Global.Graphics.GraphicsDevice);
 
-            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 256, 144);
+            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 512, 288);
 
             GameCamera = new Camera2D(GameViewport);
             GameCamera.Origin = new Vector2(0, 0);
@@ -76,7 +76,7 @@ namespace Hellscape
 
             MapContainer = new MapContainer();
             MapContainer.MapLoaded += OnMapLoad;
-            MapContainer.LoadMap("DebugRoom1");
+            MapContainer.LoadMap("DebugRoom3");
 
             TileSceneObjects = new List<TileSceneObject>();
 
@@ -84,7 +84,7 @@ namespace Hellscape
             PauseScreen = Content.Load<Texture2D>("GFX/SinglePixel");
         }
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
             switch (LoadState)
             {
@@ -100,7 +100,7 @@ namespace Hellscape
                         {
                             case GameMode.Normal:
                                 {
-                                    MapRenderer.Update(MapContainer.ActiveMap, gameTime);
+                                    MapRenderer.Update(MapContainer.ActiveMap, Global.GameTime);
                                     MapContainer.Update();
 
                                     if(TileSceneObjects.Count > 0)
@@ -111,7 +111,7 @@ namespace Hellscape
                                         }
                                     }
 
-                                    Player.Update(gameTime);
+                                    Player.Update();
                                     break;
                                 }
                             case GameMode.Paused:
@@ -194,13 +194,10 @@ namespace Hellscape
 
                                     Player.Draw();
 
-                                    Vector2 pauseStringPosition = PauseFont.MeasureString("PAUSED");
-                                    float pauseStringX = pauseStringPosition.X / 2;
-                                    float pauseStringY = pauseStringPosition.Y / 2;
-                                    pauseStringPosition = new Vector2(GameCamera.BoundingRectangle.Right / 2 - pauseStringX, GameCamera.BoundingRectangle.Bottom / 2 - pauseStringY);
+                                    Vector2 pausePosition = Common.AdjustText(new Vector2(GameCamera.BoundingRectangle.Right / 2, GameCamera.BoundingRectangle.Bottom / 2), PauseFont, "PAUSED", Common.TextHalign.Center, Common.TextValign.Middle);
 
                                     Global.SpriteBatch.Draw(PauseScreen, (Rectangle)GameCamera.BoundingRectangle, Color.Black * 0.5f);
-                                    Global.SpriteBatch.DrawString(PauseFont, "PAUSED", pauseStringPosition, Color.White);
+                                    Global.SpriteBatch.DrawString(PauseFont, "PAUSED", pausePosition, Color.White);
 
                                     Global.SpriteBatch.End();
 

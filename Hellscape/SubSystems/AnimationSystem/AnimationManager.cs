@@ -40,9 +40,9 @@ namespace Hellscape
             Animation.CurrentFrame = 0;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
-            FrameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            FrameTimer += (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
 
             if (FrameTimer >= Animation.FrameSpeed)
             {

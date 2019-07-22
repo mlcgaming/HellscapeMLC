@@ -42,12 +42,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Reference Classes\Common.cs" />
     <Compile Include="Reference Classes\InputManager.cs" />
     <Compile Include="NormalGameplay\Map Handling\TileSceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\MapLoaderSceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\TransitionHandler.cs" />
     <Compile Include="NormalGameplay\Player Handling\ActorInventory.cs" />
     <Compile Include="NormalGameplay\Player Handling\InventoryItem.cs" />
+    <Compile Include="Reference Classes\NetworkController.cs" />
     <Compile Include="Reference Classes\SceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\TileEntitySceneObject.cs" />
     <Compile Include="NormalGameplay\Map Handling\SceneObjectLoader.cs" />

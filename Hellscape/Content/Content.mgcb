@@ -49,6 +49,23 @@
 /processor:TiledMapProcessor
 /build:Data/maps/DebugRoom2.tmx
 
+#begin Data/maps/DebugRoom3.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom3.tmx
+
+#begin Data/maps/RoomTiles.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Data/maps/RoomTiles.png
+
 #begin Data/maps/TileSet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -84,6 +101,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:GFX/Characters/MainCharacterTemplate.png
+
+#begin GFX/Fonts/MainMenuItemFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:GFX/Fonts/MainMenuItemFont.spritefont
 
 #begin GFX/Fonts/PauseFont.spritefont
 /importer:FontDescriptionImporter

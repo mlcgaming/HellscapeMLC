@@ -13,8 +13,10 @@ namespace Hellscape
     {
         public static event EventHandler<MoveInputEventArgs> LeftPressed;
         public static event EventHandler<MoveInputEventArgs> RightPressed;
+        public static event EventHandler HorizontalReleased;
         public static event EventHandler<MoveInputEventArgs> UpPressed;
         public static event EventHandler<MoveInputEventArgs> DownPressed;
+        public static event EventHandler VerticalReleased;
         public static event EventHandler InteractPressed;
         public static event EventHandler JumpPressed;
         public static event EventHandler RunPressed;
@@ -40,6 +42,10 @@ namespace Hellscape
             ButtonsPressed.Add(Buttons.B, false);
             ButtonsPressed.Add(Buttons.X, false);
             ButtonsPressed.Add(Buttons.Y, false);
+            ButtonsPressed.Add(Buttons.DPadDown, false);
+            ButtonsPressed.Add(Buttons.DPadLeft, false);
+            ButtonsPressed.Add(Buttons.DPadRight, false);
+            ButtonsPressed.Add(Buttons.DPadUp, false);
             ButtonsPressed.Add(Buttons.Start, false);
         }
         public static void ProcessInputKeyboard()
@@ -84,7 +90,7 @@ namespace Hellscape
                 leftXCheck = Math.Abs(GPState.ThumbSticks.Left.X);
                 leftYCheck = Math.Abs(GPState.ThumbSticks.Left.Y);
 
-                if (leftXCheck > 0.1f)
+                if (leftXCheck > 0.15f)
                 {
                     if(GPState.ThumbSticks.Left.X > 0)
                     {
@@ -95,8 +101,12 @@ namespace Hellscape
                         OnMovedRight(GPState.ThumbSticks.Left.X);
                     }
                 }
+                else
+                {
+                    OnHorizontalReleased();
+                }
 
-                if(leftYCheck > 0.1f)
+                if(leftYCheck > 0.15f)
                 {
                     if (GPState.ThumbSticks.Left.Y > 0)
                     {
@@ -107,8 +117,84 @@ namespace Hellscape
                         OnMovedDown(GPState.ThumbSticks.Left.Y);
                     }
                 }
+                else
+                {
+                    OnVerticalReleased();
+                }
 
-                if(GPState.IsButtonDown(Buttons.B) == true)
+                if (GPState.IsButtonDown(Buttons.DPadDown) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadDown] == false)
+                    {
+                        ButtonsPressed[Buttons.DPadDown] = true;
+                    }
+
+                    OnMovedDown(-1.0f);
+                }
+                if (GPState.IsButtonUp(Buttons.DPadDown) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadDown] == true)
+                    {
+                        ButtonsPressed[Buttons.DPadDown] = false;
+                        OnVerticalReleased();
+                    }
+                }
+
+                if (GPState.IsButtonDown(Buttons.DPadUp) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadUp] == false)
+                    {
+                        ButtonsPressed[Buttons.DPadUp] = true;
+                    }
+
+                    OnMovedUp(1.0f);
+                }
+                if (GPState.IsButtonUp(Buttons.DPadUp) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadUp] == true)
+                    {
+                        ButtonsPressed[Buttons.DPadUp] = false;
+                        OnVerticalReleased();
+                    }
+                }
+
+                if (GPState.IsButtonDown(Buttons.DPadRight) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadRight] == false)
+                    {
+                        ButtonsPressed[Buttons.DPadRight] = true;
+                    }
+
+                    OnMovedRight(1.0f);
+                }
+                if (GPState.IsButtonUp(Buttons.DPadRight) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadRight] == true)
+                    {
+                        ButtonsPressed[Buttons.DPadRight] = false;
+                        OnHorizontalReleased();
+                    }
+                }
+
+                if (GPState.IsButtonDown(Buttons.DPadLeft) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadLeft] == false)
+                    {
+                        ButtonsPressed[Buttons.DPadLeft] = true;
+                    }
+
+                    OnMovedLeft(-1.0f);
+                }
+                if (GPState.IsButtonUp(Buttons.DPadLeft) == true)
+                {
+                    if (ButtonsPressed[Buttons.DPadLeft] == true)
+                    {
+                        ButtonsPressed[Buttons.DPadLeft] = false;
+                        OnHorizontalReleased();
+                    }
+                }
+
+                if (GPState.IsButtonDown(Buttons.B) == true)
                 {
                     if (ButtonsPressed[Buttons.B] == false)
                     {
@@ -179,6 +265,10 @@ namespace Hellscape
         {
             RightPressed?.Invoke(null, new MoveInputEventArgs() { InputValue = thumbstickX });
         }
+        public static void OnHorizontalReleased()
+        {
+            HorizontalReleased?.Invoke(null, EventArgs.Empty);
+        }
         public static void OnMovedLeft(float thumbstickX)
         {
             LeftPressed?.Invoke(null, new MoveInputEventArgs() { InputValue = thumbstickX });
@@ -190,6 +280,10 @@ namespace Hellscape
         public static void OnMovedDown(float thumbstickY)
         {
             DownPressed?.Invoke(null, new MoveInputEventArgs() { InputValue = thumbstickY });
+        }
+        public static void OnVerticalReleased()
+        {
+            VerticalReleased?.Invoke(null, EventArgs.Empty);
         }
         public static void OnInteractPressed()
         {

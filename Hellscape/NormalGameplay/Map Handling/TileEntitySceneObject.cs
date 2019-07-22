@@ -21,7 +21,7 @@ namespace Hellscape
         }
         public void Update()
         {
-            AnimationManager.Update(Global.GameTime);
+            AnimationManager.Update();
         }
         public void Draw()
         {

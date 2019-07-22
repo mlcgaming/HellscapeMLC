@@ -59,7 +59,7 @@ namespace Hellscape
             IsColliding = false;
             IsGrounded = true;
 
-            CreateCollisionMask(Position, 16, 24);
+            CreateCollisionMask(Position, 32, 64);
 
             AnimationManager = new AnimationManager();
             AnimationLibrary = new Dictionary<string, Animation>();
@@ -86,10 +86,10 @@ namespace Hellscape
             AnimationLibrary.Add("idle", idle);
             AnimationLibrary.Add("jump", jump);
         }
-        public void Update(GameTime gameTime)
+        public void Update()
         {
             Velocity = new Vector2(0, 0);
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
 
             ProcessInput();
 
@@ -110,7 +110,7 @@ namespace Hellscape
             if (Velocity != new Vector2(0, 0))
             {
                 ProposedPosition = Position + Velocity;
-                CreateCollisionMask(ProposedPosition, 16, 24);
+                CreateCollisionMask(ProposedPosition, 32, 64);
                 OnPlayerMoved();
 
                 if (IsColliding == true)
@@ -126,10 +126,10 @@ namespace Hellscape
 
                 Position = ProposedPosition;
                 Velocity = new Vector2(0);
-                CreateCollisionMask(Position, 16, 24);
+                CreateCollisionMask(Position, 32, 64);
             }
 
-            AnimationManager.Update(gameTime);
+            AnimationManager.Update();
         }
         public void Draw()
         {
@@ -255,7 +255,7 @@ namespace Hellscape
         public void Move(Vector2 position)
         {
             Position = position;
-            CreateCollisionMask(Position, 16, 24);
+            CreateCollisionMask(Position, 32, 64);
         }
 
         private void OnLeftPress(object source, MoveInputEventArgs args)
@@ -301,7 +301,7 @@ namespace Hellscape
             if (IsGrounded == true)
             {
                 float jumpRate = WalkSpeed * deltaTime;
-                FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 6f));
+                FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 8f));
                 IsGrounded = false;
                 AnimationManager.Play(AnimationLibrary["jump"]);
             }
