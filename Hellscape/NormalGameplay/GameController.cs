@@ -23,6 +23,7 @@ namespace Hellscape
         private Camera2D GameCamera;
         private BoxingViewportAdapter GameViewport;
         private TiledMapRenderer MapRenderer;
+        private bool IsCameraMobile;
 
         private List<TileSceneObject> TileSceneObjects;
         private Texture2D PauseScreen;
@@ -82,6 +83,8 @@ namespace Hellscape
             GameCamera = new Camera2D(GameViewport);
             GameCamera.Origin = new Vector2(0, 0);
             GameCamera.Position = new Vector2(0, 0);
+
+            IsCameraMobile = false;
 
             MapContainer = new MapContainer();
             MapContainer.MapLoaded += OnMapLoad;
@@ -144,7 +147,10 @@ namespace Hellscape
 
                                     Player.Update();
 
-                                    AdjustCamera();
+                                    if(IsCameraMobile == true)
+                                    {
+                                        AdjustCamera();
+                                    }
 
                                     break;
                                 }
@@ -261,8 +267,13 @@ namespace Hellscape
         private void NewGameSetup()
         {
             string fileName;
-            string sourcePath = Content.RootDirectory + "../../../../../../../../Hellscape/Hellscape/Content/Data/maps/SceneObjects";
+            string sourcePath = Global.DefaultsPath;
             string targetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/save/001/";
+
+            if(System.IO.Directory.Exists(targetPath) == false)
+            {
+                System.IO.Directory.CreateDirectory(targetPath);
+            }
 
             string[] files = System.IO.Directory.GetFiles(sourcePath);
 
@@ -368,8 +379,8 @@ namespace Hellscape
                     {
                         if (Player.CollisionMask.Intersects(th.CollisionMask) == true)
                         {
-                            MapContainer.LoadMap(th.TransitionMapID);
                             Player.Move(th.TransitionPosition);
+                            MapContainer.LoadMap(th.TransitionMapID);
                             return;
                         }
                     }
@@ -462,6 +473,20 @@ namespace Hellscape
         }
         public void OnMapLoad(object source, EventArgs e)
         {
+            int mapWidth, mapHeight;
+
+            mapWidth = MapContainer.ActiveMap.WidthInPixels;
+            mapHeight = MapContainer.ActiveMap.HeightInPixels;
+
+            if(mapWidth <= 512 && mapHeight <= 288)
+            {
+                IsCameraMobile = false;
+            }
+            else
+            {
+                IsCameraMobile = true;
+            }
+
             LoadState = MapLoadState.Loaded;
             Mode = GameMode.Normal;
         }

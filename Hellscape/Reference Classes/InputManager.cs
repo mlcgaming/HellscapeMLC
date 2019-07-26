@@ -64,7 +64,7 @@ namespace Hellscape
             }
             if (KeyState.IsKeyDown(Keys.A) == true)
             {
-                OnMovedLeft(1.0f);
+                OnMovedLeft(-1.0f);
             }
             if (KeyState.IsKeyDown(Keys.D) == true)
             {

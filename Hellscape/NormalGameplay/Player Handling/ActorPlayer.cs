@@ -254,8 +254,11 @@ namespace Hellscape
         }
         public void Move(Vector2 position)
         {
+            ProposedPosition = position;
             Position = position;
             CreateCollisionMask(Position, 32, 64);
+            IsGrounded = true;
+            OnPlayerMoved();
         }
 
         private void OnLeftPress(object source, MoveInputEventArgs args)

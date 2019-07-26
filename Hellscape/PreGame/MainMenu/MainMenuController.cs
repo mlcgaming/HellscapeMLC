@@ -78,6 +78,7 @@ namespace Hellscape
             }
 
             InputManager.ProcessInputGamePad(PlayerIndex.One);
+            InputManager.ProcessInputKeyboard();
         }
         public void Draw()
         {

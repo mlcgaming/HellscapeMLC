@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using Newtonsoft.Json;
 
 namespace Hellscape
 {
     public static class Global
     {
+        public static string DefaultsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HellscapeDebug/data/default/";
+
         public static float GLOBAL_OPT_BGM_VOLUME = 1.0f;
         public static float GLOBAL_OPT_SFX_VOLUME = 1.0f;
         public static Vector2 GLOBAL_OPT_WINDOW_SIZE = new Vector2(1280, 720);
@@ -41,6 +46,12 @@ namespace Hellscape
 
             PopulateDoorTriggers();
             PopulateSceneObjects();
+
+            if(Directory.Exists(DefaultsPath) == false)
+            {
+                Directory.CreateDirectory(DefaultsPath);
+                PopulateRoomSceneObjectLists();
+            }
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
         {
@@ -75,6 +86,29 @@ namespace Hellscape
 
             SceneObject silverKey = new SceneObject("soKeySilver", "Silver Key", 1, new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(16, 0)));
             SceneObjects.Add(silverKey);
+        }
+        public static void PopulateRoomSceneObjectLists()
+        {
+            List<MapLoaderSceneObject> debugRoom3 = new List<MapLoaderSceneObject>();
+            List<MapLoaderSceneObject> debugRoom4 = new List<MapLoaderSceneObject>();
+            List<MapLoaderSceneObject> debugRoom5 = new List<MapLoaderSceneObject>();
+            List<MapLoaderSceneObject> debugRoom6 = new List<MapLoaderSceneObject>();
+            List<MapLoaderSceneObject> debugRoom7 = new List<MapLoaderSceneObject>();
+
+            MapLoaderSceneObject soKeyGold = new MapLoaderSceneObject("soKeyGold", 320f, 208f, 1);
+
+            debugRoom5.Add(soKeyGold);
+
+            WriteRoomSceneObjectFile("DebugRoom3", debugRoom3);
+            WriteRoomSceneObjectFile("DebugRoom4", debugRoom4);
+            WriteRoomSceneObjectFile("DebugRoom5", debugRoom5);
+            WriteRoomSceneObjectFile("DebugRoom6", debugRoom6);
+            WriteRoomSceneObjectFile("DebugRoom7", debugRoom7);
+        }
+        public static void WriteRoomSceneObjectFile(string fileName, List<MapLoaderSceneObject> objects)
+        {
+            string filePath = Path.Combine(DefaultsPath, fileName + ".json");
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(objects, Formatting.Indented));
         }
 
         public static string GetMapAssetPathByID(string mapID)
