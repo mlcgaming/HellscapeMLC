@@ -23,6 +23,7 @@ namespace Hellscape
         public static event EventHandler RunReleased;
         public static event EventHandler InventoryPressed;
         public static event EventHandler StartPressed;
+        public static event EventHandler SelectPressed;
 
         public static Dictionary<Keys, bool> KeysPressed = new Dictionary<Keys, bool>();
         public static Dictionary<Buttons, bool> ButtonsPressed = new Dictionary<Buttons, bool>();
@@ -47,6 +48,7 @@ namespace Hellscape
             ButtonsPressed.Add(Buttons.DPadRight, false);
             ButtonsPressed.Add(Buttons.DPadUp, false);
             ButtonsPressed.Add(Buttons.Start, false);
+            ButtonsPressed.Add(Buttons.Back, false);
         }
         public static void ProcessInputKeyboard()
         {
@@ -103,7 +105,10 @@ namespace Hellscape
                 }
                 else
                 {
-                    OnHorizontalReleased();
+                    if (ButtonsPressed[Buttons.DPadLeft] == false && ButtonsPressed[Buttons.DPadRight] == false)
+                    {
+                        OnHorizontalReleased();
+                    }
                 }
 
                 if(leftYCheck > 0.15f)
@@ -119,7 +124,10 @@ namespace Hellscape
                 }
                 else
                 {
-                    OnVerticalReleased();
+                    if(ButtonsPressed[Buttons.DPadDown] == false && ButtonsPressed[Buttons.DPadUp] == false)
+                    {
+                        OnVerticalReleased();
+                    }
                 }
 
                 if (GPState.IsButtonDown(Buttons.DPadDown) == true)
@@ -258,6 +266,22 @@ namespace Hellscape
                         ButtonsPressed[Buttons.Start] = false;
                     }
                 }
+
+                if (GPState.IsButtonDown(Buttons.Back) == true)
+                {
+                    if (ButtonsPressed[Buttons.Back] == false)
+                    {
+                        ButtonsPressed[Buttons.Back] = true;
+                        OnSelectPressed();
+                    }
+                }
+                if (GPState.IsButtonUp(Buttons.Back) == true)
+                {
+                    if (ButtonsPressed[Buttons.Back] == true)
+                    {
+                        ButtonsPressed[Buttons.Back] = false;
+                    }
+                }
             }
         }
 
@@ -304,6 +328,10 @@ namespace Hellscape
         public static void OnStartPressed()
         {
             StartPressed?.Invoke(null, EventArgs.Empty);
+        }
+        public static void OnSelectPressed()
+        {
+            SelectPressed?.Invoke(null, EventArgs.Empty);
         }
     }
 }

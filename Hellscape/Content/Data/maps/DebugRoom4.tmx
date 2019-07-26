@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="9" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="8">
+ <tileset firstgid="1" name="RoomTiles" tilewidth="32" tileheight="32" tilecount="20" columns="5">
+  <image source="RoomTiles.png" width="160" height="128"/>
+ </tileset>
+ <layer id="1" name="Background" width="16" height="9">
+  <data encoding="base64">
+   DgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAALAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAMAAAAAgAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAABwAAAAIAAAATAAAADQAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAANAAAAEwAAAAcAAAACAAAAFAAAABIAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAEgAAABQAAAAHAAAAEAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAEQAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAA
+  </data>
+ </layer>
+ <objectgroup color="#ffff00" id="2" name="Transitions">
+  <object id="2" name="TransitionDoor" x="64" y="128" width="32" height="64">
+   <properties>
+    <property name="MapID" value="DebugRoom3"/>
+    <property name="PlayerX" type="float" value="64"/>
+    <property name="PlayerY" type="float" value="128"/>
+   </properties>
+  </object>
+  <object id="3" name="TransitionDoor" x="416" y="128" width="32" height="64">
+   <properties>
+    <property name="MapID" value="DebugRoom5"/>
+    <property name="PlayerX" type="float" value="64"/>
+    <property name="PlayerY" type="float" value="192"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup color="#aa0000" id="4" name="CollisionMasks">
+  <object id="4" name="CollisionSolid" x="32" y="192" width="448" height="32"/>
+  <object id="5" name="CollisionSolid" x="32" y="64" width="448" height="32"/>
+  <object id="6" name="CollisionSolid" x="0" y="64" width="32" height="160"/>
+  <object id="7" name="CollisionSolid" x="480" y="64" width="32" height="160"/>
+ </objectgroup>
+</map>

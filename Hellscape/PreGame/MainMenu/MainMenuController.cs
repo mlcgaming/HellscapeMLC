@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.ViewportAdapters;
 
 namespace Hellscape
@@ -15,6 +16,7 @@ namespace Hellscape
         public EventHandler GameStarted;
         public EventHandler GameExited;
 
+        private Texture2D MainMenuTexture;
         private List<MainMenuItem> Items;
         private int SelectedItem, LastItem;
         private float InputTimer;
@@ -24,6 +26,7 @@ namespace Hellscape
 
         public MainMenuController()
         {
+            MainMenuTexture = Global.Content.Load<Texture2D>("GFX/MainMenuTest");
             Items = new List<MainMenuItem>();
             SelectedItem = 0;
             InputTimer = 0.25f;
@@ -32,7 +35,7 @@ namespace Hellscape
             InputManager.DownPressed += OnDownPressed;
             InputManager.VerticalReleased += OnVerticalReleased;
 
-            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 512, 288);
+            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics, 512, 288, 74, 70);
 
             GameCamera = new Camera2D(GameViewport);
             GameCamera.Origin = new Vector2(0, 0);
@@ -45,10 +48,13 @@ namespace Hellscape
 
         private void Initialize()
         {
-            MainMenuItem startGame = new MainMenuItem("Start Game", new Vector2(Global.Graphics.PreferredBackBufferWidth / 2, Global.Graphics.PreferredBackBufferHeight / 2 + 48));
-            MainMenuItem networkGame = new MainMenuItem("Multiplayer", new Vector2(Global.Graphics.PreferredBackBufferWidth / 2, Global.Graphics.PreferredBackBufferHeight / 2 + 64));
-            MainMenuItem optionsMenu = new MainMenuItem("Options", new Vector2(Global.Graphics.PreferredBackBufferWidth / 2, Global.Graphics.PreferredBackBufferHeight / 2 + 80));
-            MainMenuItem exitGame = new MainMenuItem("Quit Game", new Vector2(Global.Graphics.PreferredBackBufferWidth / 2, Global.Graphics.PreferredBackBufferHeight / 2 + 96));
+            BitmapFont menuItemFont = Global.Content.Load<BitmapFont>("GFX/Fonts/MainMenuItemFont");
+            Vector2 measureString = menuItemFont.MeasureString("|");
+
+            MainMenuItem startGame = new MainMenuItem("Start Game", new Vector2(GameViewport.VirtualWidth / 2, GameViewport.VirtualHeight / 2));
+            MainMenuItem networkGame = new MainMenuItem("Multiplayer", new Vector2(GameViewport.VirtualWidth / 2, GameViewport.VirtualHeight / 2 + (measureString.Y * 1)));
+            MainMenuItem optionsMenu = new MainMenuItem("Options", new Vector2(GameViewport.VirtualWidth / 2, GameViewport.VirtualHeight / 2 + (measureString.Y * 2)));
+            MainMenuItem exitGame = new MainMenuItem("Quit Game", new Vector2(GameViewport.VirtualWidth / 2, GameViewport.VirtualHeight / 2 + (measureString.Y * 3)));
 
             startGame.ItemSelected += OnItemSelected;
             networkGame.ItemSelected += OnItemSelected;
@@ -75,9 +81,10 @@ namespace Hellscape
         }
         public void Draw()
         {
-            //var transformMatrix = GameCamera.GetViewMatrix();
+            var transformMatrix = GameCamera.GetViewMatrix();
+            Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
 
-            Global.SpriteBatch.Begin();
+            Global.SpriteBatch.Draw(MainMenuTexture, new Rectangle(0, 0, GameViewport.VirtualWidth, GameViewport.VirtualHeight), Color.White);
 
             foreach(MainMenuItem item in Items)
             {

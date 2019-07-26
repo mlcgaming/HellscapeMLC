@@ -13,6 +13,8 @@ namespace Hellscape
         public int KeyQuantity { get; protected set; }
         public bool IsTriggerLocked { get; protected set; }
         public string TriggerKey { get; private set; }
+        public bool IsInteractive { get; private set; }
+        private float InteractionTimer;
 
         public TransitionHandler(string mapID, float posX, float posY, float transitionX, float transitionY, float width, float height)
         {
@@ -20,6 +22,27 @@ namespace Hellscape
             Position = new Vector2(posX, posY);
             TransitionPosition = new Vector2(transitionX, transitionY);
             CollisionMask = new Rectangle((int)Position.X, (int)Position.Y, (int)width, (int)height);
+            IsInteractive = true;
+            InteractionTimer = 0f;
+        }
+
+        public void Update()
+        {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+            if(InteractionTimer > 0)
+            {
+                InteractionTimer -= deltaTime;
+            }
+            else
+            {
+                IsInteractive = true;
+            }
+        }
+
+        public void StartInteraction()
+        {
+            IsInteractive = false;
+            InteractionTimer = 0.35f;
         }
 
         public void LockWithKey(SceneObject key, int keyQty)

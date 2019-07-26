@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.Tiled.Graphics;
 using MonoGame.Extended.ViewportAdapters;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Hellscape
 {
     public class GameController
     {
+        public event EventHandler GameExited;
+
         private ContentManager Content;
         private MapContainer MapContainer;
         private ActorPlayer Player;
@@ -22,14 +25,16 @@ namespace Hellscape
 
         private List<TileSceneObject> TileSceneObjects;
         private Texture2D PauseScreen;
-        private SpriteFont PauseFont;
+        private BitmapFont PauseFont;
 
         private GameMode Mode;
         private MapLoadState LoadState;
         enum MapLoadState
         {
             Preparing,
+            FadeIn,
             Loaded,
+            FadeOut,
             Clearing,
             Debug
         }
@@ -60,8 +65,9 @@ namespace Hellscape
             MapContainer = new MapContainer();
 
             InputManager.StartPressed += OnStartPressed;
+            InputManager.SelectPressed += OnSelectPressed;
 
-            Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(32, 56));
+            Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(224, 192));
             Player.PlayerMoved += OnPlayerMove;
             Player.PlayerInteracted += OnPlayerInteract;
             Player.Inventory.ItemUsed += OnPlayerItemUsed;
@@ -80,7 +86,7 @@ namespace Hellscape
 
             TileSceneObjects = new List<TileSceneObject>();
 
-            PauseFont = Content.Load<SpriteFont>("GFX/Fonts/PauseFont");
+            PauseFont = Content.Load<BitmapFont>("GFX/Fonts/PauseFont");
             PauseScreen = Content.Load<Texture2D>("GFX/SinglePixel");
         }
 
@@ -93,7 +99,11 @@ namespace Hellscape
 
                         break;
                     }
+                case MapLoadState.FadeIn:
+                    {
 
+                        break;
+                    }
                 case MapLoadState.Loaded:
                     {
                         switch (Mode)
@@ -105,9 +115,22 @@ namespace Hellscape
 
                                     if(TileSceneObjects.Count > 0)
                                     {
-                                        foreach(TileSceneObject t in TileSceneObjects)
+                                        for (int i = TileSceneObjects.Count - 1; i >= 0; i--)
                                         {
-                                            t.Update();
+                                            TileSceneObject obj = TileSceneObjects.ElementAt(i);
+                                            obj.Update();
+                                            if (obj.IsDisposable == true)
+                                            {
+                                                TileSceneObjects.RemoveAt(i);
+                                            }
+                                        }
+                                    }
+
+                                    foreach(TransitionHandler th in MapContainer.TransitionHandlers)
+                                    {
+                                        if(th.IsInteractive == false)
+                                        {
+                                            th.Update();
                                         }
                                     }
 
@@ -122,7 +145,11 @@ namespace Hellscape
                         }
                         break;
                     }
+                case MapLoadState.FadeOut:
+                    {
 
+                        break;
+                    }
                 case MapLoadState.Clearing:
                     {
 
@@ -155,19 +182,14 @@ namespace Hellscape
                                 {
                                     Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
 
-                                    MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
+                                    MapRenderer.Draw(MapContainer.ActiveMap, transformMatrix);
                                     MapContainer.Draw();
 
                                     if (TileSceneObjects.Count > 0)
                                     {
-                                        for(int i = TileSceneObjects.Count - 1; i >= 0; i--)
+                                        foreach (TileSceneObject t in TileSceneObjects)
                                         {
-                                            TileSceneObject obj = TileSceneObjects.ElementAt(i);
-                                            obj.Draw();
-                                            if(obj.IsDisposable == true)
-                                            {
-                                                TileSceneObjects.RemoveAt(i);
-                                            }
+                                            t.Draw();
                                         }
                                     }
 
@@ -181,7 +203,7 @@ namespace Hellscape
                                 {
                                     Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
 
-                                    MapRenderer.Draw(MapContainer.ActiveMap, GameCamera.GetViewMatrix());
+                                    MapRenderer.Draw(MapContainer.ActiveMap, transformMatrix);
                                     MapContainer.Draw();
 
                                     if (TileSceneObjects.Count > 0)
@@ -252,6 +274,13 @@ namespace Hellscape
                 Mode = GameMode.Paused;
             }
         }
+        private void OnSelectPressed(object source, EventArgs args)
+        {
+            if(Mode == GameMode.Paused)
+            {
+                OnGameExit();
+            }
+        }
         public void OnPlayerMove(object source, EventArgs e)
         {
             // Check for Collisions against ProposedPosition on Player
@@ -298,32 +327,54 @@ namespace Hellscape
 
             foreach(TransitionHandler t in MapContainer.TransitionHandlers)
             {
-                if(t.CollisionMask.Intersects(Player.CollisionMask) == true)
+                if(t.IsInteractive == true)
                 {
-                    if(t.IsKeyLocked == true)
+                    if (t.CollisionMask.Intersects(Player.CollisionMask) == true)
                     {
-                        foreach(InventoryItem i in Player.Inventory.Items)
+                        if (t.IsKeyLocked == true)
                         {
-                            if(i.Item.ShortName == t.Key.ShortName && i.Quantity >= t.KeyQuantity)
+                            foreach (InventoryItem i in Player.Inventory.Items)
                             {
-                                SoundEffect doorOpenSFX = Content.Load<SoundEffect>("Audio/SFX/TurningKey");
-                                doorOpenSFX.Play(0.75f, 0.5f, 0.5f);
+                                if (i.Item.ShortName == t.Key.ShortName && i.Quantity >= t.KeyQuantity)
+                                {
+                                    SoundEffect doorOpenSFX = Content.Load<SoundEffect>("Audio/SFX/TurningKey");
+                                    doorOpenSFX.Play(0.75f, 0.5f, 0.5f);
+
+                                    Player.Move(t.TransitionPosition);
+                                    MapContainer.LoadMap(t.TransitionMapID);
+                                    return;
+                                }
+                            }
+
+                            SoundEffect doorLockSFX = Content.Load<SoundEffect>("Audio/SFX/lockeddoor");
+                            doorLockSFX.Play(0.25f, 0.5f, 0.5f);
+
+                            TileSceneObject doorLockIndicator = new TileSceneObject(new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(32, 0)), new Vector2(t.Position.X, t.Position.Y - 16), new Vector2(0, -8));
+                            TileSceneObjects.Add(doorLockIndicator);
+
+                            t.StartInteraction();
+                        }
+                        else if (t.IsTriggerLocked == true)
+                        {
+                            if (Global.DoorTriggers[t.TriggerKey] == true)
+                            {
+                                SoundEffect doorOpenSFX = Content.Load<SoundEffect>("Audio/SFX/DoorOpen");
+                                doorOpenSFX.Play(0.25f, 0.5f, 0.5f);
 
                                 Player.Move(t.TransitionPosition);
                                 MapContainer.LoadMap(t.TransitionMapID);
                                 return;
                             }
+
+                            SoundEffect doorLockSFX = Content.Load<SoundEffect>("Audio/SFX/lockeddoor");
+                            doorLockSFX.Play(0.25f, 1.0f, 1.0f);
+
+                            TileSceneObject doorLockIndicator = new TileSceneObject(new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(32, 0)), new Vector2(t.Position.X, t.Position.Y - 16), new Vector2(0, -8));
+                            TileSceneObjects.Add(doorLockIndicator);
+
+                            t.StartInteraction();
                         }
-
-                        SoundEffect doorLockSFX = Content.Load<SoundEffect>("Audio/SFX/lockeddoor");
-                        doorLockSFX.Play(0.25f, 0.5f, 0.5f);
-
-                        TileSceneObject doorLockIndicator = new TileSceneObject(new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(32,0)), new Vector2(t.Position.X, t.Position.Y - 16), new Vector2(0, -8));
-                        TileSceneObjects.Add(doorLockIndicator);
-                    }
-                    else if(t.IsTriggerLocked == true)
-                    {
-                        if(Global.DoorTriggers[t.TriggerKey] == true)
+                        else
                         {
                             SoundEffect doorOpenSFX = Content.Load<SoundEffect>("Audio/SFX/DoorOpen");
                             doorOpenSFX.Play(0.25f, 0.5f, 0.5f);
@@ -332,23 +383,8 @@ namespace Hellscape
                             MapContainer.LoadMap(t.TransitionMapID);
                             return;
                         }
-
-                        SoundEffect doorLockSFX = Content.Load<SoundEffect>("Audio/SFX/lockeddoor");
-                        doorLockSFX.Play(0.25f, 1.0f, 1.0f);
-
-                        TileSceneObject doorLockIndicator = new TileSceneObject(new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(32, 0)), new Vector2(t.Position.X, t.Position.Y - 16), new Vector2(0, -8));
-                        TileSceneObjects.Add(doorLockIndicator);
-                    }
-                    else
-                    {
-                        SoundEffect doorOpenSFX = Content.Load<SoundEffect>("Audio/SFX/DoorOpen");
-                        doorOpenSFX.Play(0.25f, 0.5f, 0.5f);
-
-                        Player.Move(t.TransitionPosition);
-                        MapContainer.LoadMap(t.TransitionMapID);
                         return;
                     }
-                    return;
                 }
             }
         }
@@ -360,6 +396,10 @@ namespace Hellscape
         {
             LoadState = MapLoadState.Loaded;
             Mode = GameMode.Normal;
+        }
+        public void OnGameExit()
+        {
+            GameExited?.Invoke(null, EventArgs.Empty);
         }
     }
 }

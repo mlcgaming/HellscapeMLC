@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Hellscape
 {
@@ -22,7 +23,7 @@ namespace Hellscape
         {
             return new Rectangle((int)position.X, (int)position.Y, width, height);
         }
-        public static Vector2 AdjustText(Vector2 position, SpriteFont font, string text, TextHalign halign, TextValign valign)
+        public static Vector2 AdjustText(Vector2 position, BitmapFont font, string text, TextHalign halign, TextValign valign)
         {
             Vector2 stringMeasure = font.MeasureString(text);
             float hAdjust, vAdjust;

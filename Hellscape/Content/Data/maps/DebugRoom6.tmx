@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="9" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="2">
+ <tileset firstgid="1" name="RoomTiles" tilewidth="32" tileheight="32" tilecount="20" columns="5">
+  <image source="RoomTiles.png" width="160" height="128"/>
+ </tileset>
+ <layer id="1" name="Background" width="16" height="9">
+  <data encoding="base64">
+   CwAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAADAAAAAIAAAAPAAAADQAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAAEwAAABMAAAATAAAAEwAAAAcAAAACAAAAFAAAABIAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABMAAAATAAAAEwAAABMAAAAHAAAAEAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAQAAAATAAAAEwAAABMAAAATAAAABwAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAACAAAADgAAABMAAAAOAAAAEwAAAAcAAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAAAgAAAA4AAAATAAAADgAAAA4AAAAHAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAAIAAAAOAAAADgAAAA4AAAAOAAAABwAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAACAAAADgAAAA4AAAAOAAAADgAAAAcAAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAADgAAAA4AAAAOAAAAAgAAAA4AAAAOAAAADgAAAA4AAAAHAAAA
+  </data>
+ </layer>
+ <objectgroup color="#aa0000" id="2" name="CollisionMasks"/>
+ <objectgroup color="#ffff00" id="3" name="Transitions">
+  <object id="1" name="TransitionDoor" x="64" y="32" width="32" height="64">
+   <properties>
+    <property name="MapID" value="DebugRoom3"/>
+    <property name="PlayerX" type="float" value="384"/>
+    <property name="PlayerY" type="float" value="192"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

@@ -54,6 +54,21 @@
 /processor:TiledMapProcessor
 /build:Data/maps/DebugRoom3.tmx
 
+#begin Data/maps/DebugRoom4.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom4.tmx
+
+#begin Data/maps/DebugRoom5.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom5.tmx
+
+#begin Data/maps/DebugRoom6.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom6.tmx
+
 #begin Data/maps/RoomTiles.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -102,19 +117,51 @@
 /processorParam:TextureFormat=Color
 /build:GFX/Characters/MainCharacterTemplate.png
 
-#begin GFX/Fonts/MainMenuItemFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:GFX/Fonts/MainMenuItemFont.spritefont
+#begin GFX/Fonts/MainMenuItemFont.fnt
+/importer:BitmapFontImporter
+/processor:BitmapFontProcessor
+/build:GFX/Fonts/MainMenuItemFont.fnt
 
-#begin GFX/Fonts/PauseFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
+#begin GFX/Fonts/MainMenuItemFont_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
 /processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:GFX/Fonts/PauseFont.spritefont
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GFX/Fonts/MainMenuItemFont_0.png
+
+#begin GFX/Fonts/PauseFont.fnt
+/importer:BitmapFontImporter
+/processor:BitmapFontProcessor
+/build:GFX/Fonts/PauseFont.fnt
+
+#begin GFX/Fonts/PauseFont_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GFX/Fonts/PauseFont_0.png
+
+#begin GFX/MainMenuTest.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GFX/MainMenuTest.png
 
 #begin GFX/Portraits/PlaceholderCharacterPortrait.png
 /importer:TextureImporter

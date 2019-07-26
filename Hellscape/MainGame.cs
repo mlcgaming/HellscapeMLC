@@ -113,6 +113,7 @@ namespace Hellscape
         {
             GameController = new GameController();
             State = WindowState.NormalPlay;
+            GameController.GameExited += OnGameExited;
 
             MainMenu.Dispose();
             MainMenu.GameStarted -= OnGameStarted;

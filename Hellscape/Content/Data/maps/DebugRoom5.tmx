@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="9" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="9">
+ <tileset firstgid="1" name="RoomTiles" tilewidth="32" tileheight="32" tilecount="20" columns="5">
+  <image source="RoomTiles.png" width="160" height="128"/>
+ </tileset>
+ <layer id="1" name="Background" width="16" height="9">
+  <data encoding="base64">
+   CwAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAADAAAAAIAAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAAcAAAACAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAAHAAAAAgAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAABwAAAAIAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAAAcAAAACAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAAHAAAAAgAAABMAAAANAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAAEwAAABMAAAATAAAABwAAAAIAAAAUAAAAEgAAABQAAAAUAAAAFAAAABQAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAFAAAAAcAAAAQAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAEQAAAA4AAAAOAAAADgAAAA4AAAAOAAAAEAAAAAEAAAARAAAA
+  </data>
+ </layer>
+ <objectgroup color="#aa0000" id="2" name="CollisionMasks">
+  <object id="2" name="CollisionSolid" x="0" y="256" width="512" height="32"/>
+  <object id="3" name="CollisionSolid" x="224" y="224" width="224" height="32"/>
+  <object id="4" name="CollisionSolid" x="0" y="0" width="512" height="32"/>
+  <object id="5" name="CollisionSolid" x="0" y="32" width="32" height="224"/>
+  <object id="6" name="CollisionSolid" x="480" y="32" width="32" height="224"/>
+ </objectgroup>
+ <objectgroup color="#ffff00" id="3" name="Transitions">
+  <object id="8" name="TransitionDoor" x="64" y="192" width="32" height="64">
+   <properties>
+    <property name="MapID" value="DebugRoom4"/>
+    <property name="PlayerX" type="float" value="416"/>
+    <property name="PlayerY" type="float" value="128"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

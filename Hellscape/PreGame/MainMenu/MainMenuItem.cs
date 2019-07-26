@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Hellscape
 {
@@ -20,16 +21,16 @@ namespace Hellscape
         private string Text;
         public bool IsSelected { get;  protected set; }
         private Vector2 Position;
-        private SpriteFont Font;
+        private BitmapFont Font;
 
         public MainMenuItem(string text, Vector2 textCenterPosition)
         {
             Text = text;
             IsSelected = false;
             Position = textCenterPosition;
-            Font = Global.Content.Load<SpriteFont>("GFX/Fonts/MainMenuItemFont");
+            Font = Global.Content.Load<BitmapFont>("GFX/Fonts/MainMenuItemFont");
 
-            Common.AdjustText(Position, Font, Text, Common.TextHalign.Center, Common.TextValign.Middle);
+            Position = Common.AdjustText(Position, Font, Text, Common.TextHalign.Center, Common.TextValign.Middle);
 
             InputManager.JumpPressed += OnConfirmPressed;
             InputManager.StartPressed += OnConfirmPressed;
@@ -39,11 +40,12 @@ namespace Hellscape
         {
             if(IsSelected == true)
             {
-                Global.SpriteBatch.DrawString(Font, Text, Position, Color.Yellow);
+                //Global.SpriteBatch.DrawString(Font, Text, Position, Color.BlueViolet);
+                Global.SpriteBatch.DrawString(Font, Text, Position, Color.BlueViolet);
             }
             else
             {
-                Global.SpriteBatch.DrawString(Font, Text, Position, Color.White);
+                Global.SpriteBatch.DrawString(Font, Text, Position, Color.DarkGray);
             }
         }
 

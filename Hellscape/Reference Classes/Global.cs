@@ -13,7 +13,6 @@ namespace Hellscape
         public static bool GLOBAL_OPT_FULLSCREEN_ENABLED = false;
         public static bool GLOBAL_CONTROLLER_IS_CONNECTED = true;
         public const float GRAVITY_RATE = 8f;
-        
 
         public static ContentManager Content;
         public static SpriteBatch SpriteBatch;
