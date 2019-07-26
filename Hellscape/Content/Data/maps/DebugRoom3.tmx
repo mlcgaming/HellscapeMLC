@@ -9,7 +9,7 @@
   </data>
  </layer>
  <objectgroup color="#ffff00" id="3" name="Transitions">
-  <object id="8" name="TransitionDoorLocked" x="384" y="192" width="32" height="64">
+  <object id="8" name="TransitionDoor" x="384" y="192" width="32" height="64">
    <properties>
     <property name="KeyQuantity" type="int" value="1"/>
     <property name="KeyShortname" value="soKeyGold"/>

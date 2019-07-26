@@ -15,6 +15,7 @@ namespace Hellscape
         public string TriggerKey { get; private set; }
         public bool IsInteractive { get; private set; }
         private float InteractionTimer;
+        public bool IsSilent { get; private set; }
 
         public TransitionHandler(string mapID, float posX, float posY, float transitionX, float transitionY, float width, float height)
         {
@@ -24,6 +25,7 @@ namespace Hellscape
             CollisionMask = new Rectangle((int)Position.X, (int)Position.Y, (int)width, (int)height);
             IsInteractive = true;
             InteractionTimer = 0f;
+            IsSilent = false;
         }
 
         public void Update()
@@ -56,6 +58,11 @@ namespace Hellscape
         {
             IsTriggerLocked = true;
             TriggerKey = triggerKey;
+        }
+
+        public void SetAsSilent()
+        {
+            IsSilent = true;
         }
     }
 }

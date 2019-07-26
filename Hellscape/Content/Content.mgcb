@@ -15,6 +15,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/BGM/MansionFirstFloor.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/BGM/MansionFirstFloor.mp3
+
 #begin Audio/SFX/DoorOpen.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -68,6 +74,11 @@
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
 /build:Data/maps/DebugRoom6.tmx
+
+#begin Data/maps/DebugRoom7.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:Data/maps/DebugRoom7.tmx
 
 #begin Data/maps/RoomTiles.png
 /importer:TextureImporter

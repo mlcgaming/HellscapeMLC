@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended;
@@ -14,6 +15,7 @@ namespace Hellscape
         public TiledMap ActiveMap { get; protected set; }
         private TiledMap MapToLoad;
         private ContentManager Content;
+        public Rectangle BoundingBox { get; private set; } 
         public List<EntityCollisionSolid> CollisionSolids { get; protected set; }
         public List<TransitionHandler> TransitionHandlers { get; protected set; }
         public List<TileEntitySceneObject> TileSceneObjects { get; protected set; }
@@ -100,11 +102,20 @@ namespace Hellscape
                             TransitionHandlers.Add(transition);
                             break;
                         }
+                    case "TransitionSilent":
+                        {
+                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                            transition.SetAsSilent();
+                            TransitionHandlers.Add(transition);
+                            break;
+                        }
                 }
             }
 
             ActiveMap = MapToLoad;
             TileSceneObjects = new List<TileEntitySceneObject>(loader.LoadSceneObjects(mapID));
+
+            BoundingBox = new Rectangle(0, 0, ActiveMap.WidthInPixels, ActiveMap.HeightInPixels);
 
             OnMapLoaded();
         }

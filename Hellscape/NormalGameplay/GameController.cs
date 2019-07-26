@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.Tiled.Graphics;
@@ -26,6 +27,8 @@ namespace Hellscape
         private List<TileSceneObject> TileSceneObjects;
         private Texture2D PauseScreen;
         private BitmapFont PauseFont;
+
+        private Song BGM;
 
         private GameMode Mode;
         private MapLoadState LoadState;
@@ -74,7 +77,7 @@ namespace Hellscape
 
             MapRenderer = new TiledMapRenderer(Global.Graphics.GraphicsDevice);
 
-            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 512, 288);
+            GameViewport = new BoxingViewportAdapter(Global.Window, Global.Graphics.GraphicsDevice, 512, 288, 148, 140);
 
             GameCamera = new Camera2D(GameViewport);
             GameCamera.Origin = new Vector2(0, 0);
@@ -88,6 +91,11 @@ namespace Hellscape
 
             PauseFont = Content.Load<BitmapFont>("GFX/Fonts/PauseFont");
             PauseScreen = Content.Load<Texture2D>("GFX/SinglePixel");
+
+            BGM = Content.Load<Song>("Audio/BGM/MansionFirstFloor");
+            MediaPlayer.Volume = 0.15f;
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(BGM);
         }
 
         public void Update()
@@ -135,6 +143,9 @@ namespace Hellscape
                                     }
 
                                     Player.Update();
+
+                                    AdjustCamera();
+
                                     break;
                                 }
                             case GameMode.Paused:
@@ -216,8 +227,8 @@ namespace Hellscape
 
                                     Player.Draw();
 
-                                    Vector2 pausePosition = Common.AdjustText(new Vector2(GameCamera.BoundingRectangle.Right / 2, GameCamera.BoundingRectangle.Bottom / 2), PauseFont, "PAUSED", Common.TextHalign.Center, Common.TextValign.Middle);
-
+                                    Vector2 pausePosition = Common.AdjustText(new Vector2(GameCamera.BoundingRectangle.Width / 2 + GameCamera.Position.X, GameCamera.BoundingRectangle.Height / 2 +  GameCamera.Position.Y), PauseFont, "PAUSED", Common.TextHalign.Center, Common.TextValign.Middle);
+                                    
                                     Global.SpriteBatch.Draw(PauseScreen, (Rectangle)GameCamera.BoundingRectangle, Color.Black * 0.5f);
                                     Global.SpriteBatch.DrawString(PauseFont, "PAUSED", pausePosition, Color.White);
 
@@ -260,6 +271,47 @@ namespace Hellscape
                 fileName = System.IO.Path.GetFileName(s);
                 string destFile = System.IO.Path.Combine(targetPath, fileName);
                 System.IO.File.Copy(s, destFile, true);
+            }
+        }
+
+        private void AdjustCamera()
+        {
+            Vector2 _adjustPosition;
+
+            int cameraX = Player.CollisionMask.Center.X - (GameViewport.BoundingRectangle.Width / 2);
+            int cameraY = Player.CollisionMask.Center.Y - (GameViewport.BoundingRectangle.Height / 2);
+
+            _adjustPosition = new Vector2(cameraX, cameraY);
+            GameCamera.Position = _adjustPosition;
+
+            if (GameCamera.BoundingRectangle.Bottom > MapContainer.BoundingBox.Height)
+            {
+                cameraX = (int)GameCamera.Position.X;
+                cameraY = MapContainer.BoundingBox.Height - (int)GameCamera.BoundingRectangle.Height;
+                _adjustPosition = new Vector2(cameraX, cameraY);
+                GameCamera.Position = _adjustPosition;
+            }
+            else if (GameCamera.BoundingRectangle.Top < 0)
+            {
+                cameraX = (int)GameCamera.Position.X;
+                cameraY = 0;
+                _adjustPosition = new Vector2(cameraX, cameraY);
+                GameCamera.Position = _adjustPosition;
+            }
+
+            if (GameCamera.BoundingRectangle.Right > MapContainer.BoundingBox.Width)
+            {
+                cameraX = MapContainer.BoundingBox.Width - (int)GameCamera.BoundingRectangle.Width;
+                cameraY = (int)GameCamera.Position.Y;
+                _adjustPosition = new Vector2(cameraX, cameraY);
+                GameCamera.Position = _adjustPosition;
+            }
+            else if (GameCamera.BoundingRectangle.Left < 0)
+            {
+                cameraX = 0;
+                cameraY = (int)GameCamera.Position.Y;
+                _adjustPosition = new Vector2(cameraX, cameraY);
+                GameCamera.Position = _adjustPosition;
             }
         }
 
@@ -306,6 +358,22 @@ namespace Hellscape
                 }
 
                 Player.PlayerFalling();
+            }
+
+            if(MapContainer.TransitionHandlers.Count > 0)
+            {
+                foreach (TransitionHandler th in MapContainer.TransitionHandlers)
+                {
+                    if (th.IsSilent == true)
+                    {
+                        if (Player.CollisionMask.Intersects(th.CollisionMask) == true)
+                        {
+                            MapContainer.LoadMap(th.TransitionMapID);
+                            Player.Move(th.TransitionPosition);
+                            return;
+                        }
+                    }
+                }
             }
         }
         private void OnPlayerInteract(object source, EventArgs args)
