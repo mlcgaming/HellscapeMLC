@@ -19,6 +19,7 @@ namespace Hellscape
         public List<EntityCollisionSolid> CollisionSolids { get; protected set; }
         public List<TransitionHandler> TransitionHandlers { get; protected set; }
         public List<TileEntitySceneObject> TileSceneObjects { get; protected set; }
+        public List<EntityLadder> InteractiveEntities { get; private set; }
 
         public MapContainer()
         {
@@ -30,6 +31,7 @@ namespace Hellscape
 
             CollisionSolids = new List<EntityCollisionSolid>();
             TransitionHandlers = new List<TransitionHandler>();
+            InteractiveEntities = new List<EntityLadder>();
         }
 
         /// <summary>
@@ -64,51 +66,75 @@ namespace Hellscape
             MapID = mapID;
             string assetPath = Global.GetMapAssetPathByID(MapID);
             MapToLoad = Content.Load<TiledMap>(assetPath);
+
             TiledMapObjectLayer collisionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("CollisionMasks");
             TiledMapObjectLayer transitionLayer = MapToLoad.GetLayer<TiledMapObjectLayer>("Transitions");
-            foreach (TiledMapObject _sceneObject in collisionLayer.Objects)
+            TiledMapObjectLayer interactive = MapToLoad.GetLayer<TiledMapObjectLayer>("Interactive");
+
+            if(collisionLayer.Objects.Length > 0 && collisionLayer != null)
             {
-                switch (_sceneObject.Name)
+                foreach (TiledMapObject _sceneObject in collisionLayer.Objects)
                 {
-                    case "CollisionSolid":
-                        {
-                            EntityCollisionSolid _newCollisionObject = new EntityCollisionSolid(_sceneObject.Position, (int)_sceneObject.Size.Width, (int)_sceneObject.Size.Height);
-                            CollisionSolids.Add(_newCollisionObject);
-                            break;
-                        }
+                    switch (_sceneObject.Name)
+                    {
+                        case "CollisionSolid":
+                            {
+                                EntityCollisionSolid _newCollisionObject = new EntityCollisionSolid(_sceneObject.Position, (int)_sceneObject.Size.Width, (int)_sceneObject.Size.Height);
+                                CollisionSolids.Add(_newCollisionObject);
+                                break;
+                            }
+                    }
                 }
             }
-            foreach(TiledMapObject _transition in transitionLayer.Objects)
+            if(transitionLayer.Objects.Length > 0 && transitionLayer != null)
             {
-                switch (_transition.Name)
+                foreach (TiledMapObject _transition in transitionLayer.Objects)
                 {
-                    case "TransitionDoor":
-                        {
-                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
-                            TransitionHandlers.Add(transition);
-                            break;
-                        }
-                    case "TransitionDoorLocked":
-                        {
-                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
-                            if(_transition.Properties["LockType"] == "Key")
+                    switch (_transition.Name)
+                    {
+                        case "TransitionDoor":
                             {
-                                transition.LockWithKey(Global.GetSceneObjectBYID(_transition.Properties["KeyShortname"]), int.Parse(_transition.Properties["KeyQuantity"]));
+                                TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                                TransitionHandlers.Add(transition);
+                                break;
                             }
-                            if (_transition.Properties["LockType"] == "Trigger")
+                        case "TransitionDoorLocked":
                             {
-                                transition.LockWithTrigger(_transition.Properties["TriggerKey"]);
+                                TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                                if (_transition.Properties["LockType"] == "Key")
+                                {
+                                    transition.LockWithKey(Global.GetSceneObjectBYID(_transition.Properties["KeyShortname"]), int.Parse(_transition.Properties["KeyQuantity"]));
+                                }
+                                if (_transition.Properties["LockType"] == "Trigger")
+                                {
+                                    transition.LockWithTrigger(_transition.Properties["TriggerKey"]);
+                                }
+                                TransitionHandlers.Add(transition);
+                                break;
                             }
-                            TransitionHandlers.Add(transition);
-                            break;
-                        }
-                    case "TransitionSilent":
-                        {
-                            TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
-                            transition.SetAsSilent();
-                            TransitionHandlers.Add(transition);
-                            break;
-                        }
+                        case "TransitionSilent":
+                            {
+                                TransitionHandler transition = new TransitionHandler(_transition.Properties["MapID"], _transition.Position.X, _transition.Position.Y, float.Parse(_transition.Properties["PlayerX"]), float.Parse(_transition.Properties["PlayerY"]), _transition.Size.Width, _transition.Size.Height);
+                                transition.SetAsSilent();
+                                TransitionHandlers.Add(transition);
+                                break;
+                            }
+                    }
+                }
+            }
+            if(interactive != null && interactive.Objects.Length > 0)
+            {
+                foreach (TiledMapObject _interactive in interactive.Objects)
+                {
+                    switch (_interactive.Name)
+                    {
+                        case "InteractiveLadder":
+                            {
+                                EntityLadder ladder = new EntityLadder(_interactive.Position, (int)_interactive.Size.Width, (int)_interactive.Size.Height);
+                                InteractiveEntities.Add(ladder);
+                                break;
+                            }
+                    }
                 }
             }
 

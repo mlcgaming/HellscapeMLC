@@ -115,11 +115,11 @@ namespace Hellscape
                 {
                     if (GPState.ThumbSticks.Left.Y > 0)
                     {
-                        OnMovedUp(GPState.ThumbSticks.Left.Y);
+                        OnMovedUp(-GPState.ThumbSticks.Left.Y);
                     }
                     else
                     {
-                        OnMovedDown(GPState.ThumbSticks.Left.Y);
+                        OnMovedDown(-GPState.ThumbSticks.Left.Y);
                     }
                 }
                 else
@@ -137,7 +137,7 @@ namespace Hellscape
                         ButtonsPressed[Buttons.DPadDown] = true;
                     }
 
-                    OnMovedDown(-1.0f);
+                    OnMovedDown(1.0f);
                 }
                 if (GPState.IsButtonUp(Buttons.DPadDown) == true)
                 {
@@ -155,7 +155,7 @@ namespace Hellscape
                         ButtonsPressed[Buttons.DPadUp] = true;
                     }
 
-                    OnMovedUp(1.0f);
+                    OnMovedUp(-1.0f);
                 }
                 if (GPState.IsButtonUp(Buttons.DPadUp) == true)
                 {

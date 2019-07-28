@@ -14,7 +14,7 @@ namespace Hellscape
 
         public static float GLOBAL_OPT_BGM_VOLUME = 1.0f;
         public static float GLOBAL_OPT_SFX_VOLUME = 1.0f;
-        public static Vector2 GLOBAL_OPT_WINDOW_SIZE = new Vector2(1280, 720);
+        public static Vector2 GLOBAL_OPT_WINDOW_SIZE = new Vector2(1024, 576);
         public static bool GLOBAL_OPT_FULLSCREEN_ENABLED = false;
         public static bool GLOBAL_CONTROLLER_IS_CONNECTED = true;
         public const float GRAVITY_RATE = 8f;
@@ -34,7 +34,7 @@ namespace Hellscape
             GLOBAL_OPT_BGM_VOLUME = 1.0f;
             GLOBAL_OPT_SFX_VOLUME = 1.0f;
             GLOBAL_OPT_FULLSCREEN_ENABLED = false;
-            GLOBAL_OPT_WINDOW_SIZE = new Vector2(1280, 720);
+            GLOBAL_OPT_WINDOW_SIZE = new Vector2(GLOBAL_OPT_WINDOW_SIZE.X, GLOBAL_OPT_WINDOW_SIZE.Y);
             GLOBAL_CONTROLLER_IS_CONNECTED = false;
             Content = content;
             SpriteBatch = spriteBatch;
@@ -47,11 +47,8 @@ namespace Hellscape
             PopulateDoorTriggers();
             PopulateSceneObjects();
 
-            if(Directory.Exists(DefaultsPath) == false)
-            {
-                Directory.CreateDirectory(DefaultsPath);
-                PopulateRoomSceneObjectLists();
-            }
+            Directory.CreateDirectory(DefaultsPath);
+            PopulateRoomSceneObjectLists();
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
         {
@@ -95,7 +92,7 @@ namespace Hellscape
             List<MapLoaderSceneObject> debugRoom6 = new List<MapLoaderSceneObject>();
             List<MapLoaderSceneObject> debugRoom7 = new List<MapLoaderSceneObject>();
 
-            MapLoaderSceneObject soKeyGold = new MapLoaderSceneObject("soKeyGold", 320f, 208f, 1);
+            MapLoaderSceneObject soKeyGold = new MapLoaderSceneObject("soKeyGold", 320f, 160f, 1);
 
             debugRoom5.Add(soKeyGold);
 

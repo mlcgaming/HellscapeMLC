@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NormalGameplay\Map Handling\EntityLadder.cs" />
     <Compile Include="Reference Classes\Common.cs" />
     <Compile Include="Reference Classes\InputManager.cs" />
     <Compile Include="NormalGameplay\Map Handling\TileSceneObject.cs" />

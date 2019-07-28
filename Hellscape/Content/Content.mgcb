@@ -128,6 +128,23 @@
 /processorParam:TextureFormat=Color
 /build:GFX/Characters/MainCharacterTemplate.png
 
+#begin GFX/Fonts/DebugFont.fnt
+/importer:BitmapFontImporter
+/processor:BitmapFontProcessor
+/build:GFX/Fonts/DebugFont.fnt
+
+#begin GFX/Fonts/DebugFont_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GFX/Fonts/DebugFont_0.png
+
 #begin GFX/Fonts/MainMenuItemFont.fnt
 /importer:BitmapFontImporter
 /processor:BitmapFontProcessor

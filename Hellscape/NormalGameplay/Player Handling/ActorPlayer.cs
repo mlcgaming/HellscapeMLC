@@ -8,32 +8,48 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Hellscape
 {
+    public class PlayerClimbedEventArgs
+    {
+        public EntityLadder Ladder;
+    }
     public class ActorPlayer
     {
         public delegate void PlayerMoveEventHandler(object source, EventArgs e);
+        public delegate void PlayerClimbEventHandler(object source, PlayerClimbedEventArgs args);
         public event PlayerMoveEventHandler PlayerMoved;
         public event EventHandler PlayerInteracted;
+        public event PlayerClimbEventHandler PlayerClimbed;
 
-        public int ID { get; protected set; }
-        public PlayerIndex Controller { get; protected set; }
-        public Texture2D Sprite { get; protected set; }
-        public Vector2 Position { get; protected set; }
-        public Vector2 ProposedPosition { get; protected set; }
+        public int ID { get; }
+        public PlayerIndex Controller { get; private set; }
+        public Texture2D Sprite { get; }
+        public Vector2 Position { get; private set; }
+        public Vector2 ProposedPosition { get; private set; }
         private Vector2 Velocity { get; set; }
         private Vector2 FallVector { get; set; }
-        public Rectangle CollisionMask { get; protected set; }
+        public Rectangle CollisionMask { get; private set; }
         private ContentManager Content;
         private float MoveSpeed;
         private float WalkSpeed;
         private float RunSpeed;
         private List<Rectangle> Collisions;
         private bool IsColliding;
-        public bool IsGrounded { get; protected set; }
+        public bool IsGrounded { get; private set; }
+        private EntityLadder ActiveLadder;
+
         private ActorFacing Facing;
+        public MovementType Movement { get; private set; }
         enum ActorFacing
         {
             Left,
             Right
+        }
+        public enum MovementType
+        {
+            Idle,
+            RunWalk,
+            Crawl,
+            Climb
         }
 
         private AnimationManager AnimationManager;
@@ -64,6 +80,9 @@ namespace Hellscape
             AnimationManager = new AnimationManager();
             AnimationLibrary = new Dictionary<string, Animation>();
             Facing = ActorFacing.Right;
+            Movement = MovementType.RunWalk;
+
+            ActiveLadder = null;
 
             LoadContent();
 
@@ -71,6 +90,8 @@ namespace Hellscape
 
             Inventory = new ActorInventory();
 
+            InputManager.DownPressed += OnDownPress;
+            InputManager.UpPressed += OnUpPress;
             InputManager.LeftPressed += OnLeftPress;
             InputManager.RightPressed += OnRightPress;
             InputManager.JumpPressed += OnJumpPress;
@@ -83,17 +104,92 @@ namespace Hellscape
         {
             Animation idle = new Animation(Content.Load<Texture2D>("GFX/Characters/MainCharacterTemplate"), 4, 24, 16, 0.075f, new Vector2(0, 0));
             Animation jump = new Animation(Content.Load<Texture2D>("GFX/Characters/MainCharacterTemplate"), 1, 24, 16, 0f, new Vector2(0, 48));
+            Animation climbLadder = new Animation(Content.Load<Texture2D>("GFX/Characters/MainCharacterTemplate"), 1, 24, 16, 0f, new Vector2(0, 48));
             AnimationLibrary.Add("idle", idle);
             AnimationLibrary.Add("jump", jump);
+            AnimationLibrary.Add("climbLadder", climbLadder);
         }
         public void Update()
         {
             Velocity = new Vector2(0, 0);
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
 
             ProcessInput();
 
-            if(IsGrounded == false)
+            switch (Movement)
+            {
+                case MovementType.Climb:
+                    {
+                        UpdateClimb();
+                        break;
+                    }
+
+                case MovementType.Idle:
+                    {
+
+                        break;
+                    }
+                case MovementType.RunWalk:
+                    {
+                        UpdateRunWalk();
+                        break;
+                    }
+            }
+
+            AnimationManager.Update();
+        }
+        public void Draw()
+        {
+            switch (Movement)
+            {
+                case MovementType.RunWalk:
+                    {
+                        if (Facing == ActorFacing.Right)
+                        {
+                            AnimationManager.Draw(CollisionMask, SpriteEffects.None);
+                        }
+                        else
+                        {
+                            AnimationManager.Draw(CollisionMask, SpriteEffects.FlipHorizontally);
+                        }
+                        break;
+                    }
+                case MovementType.Climb:
+                    {
+                        AnimationManager.Draw(CollisionMask, SpriteEffects.None);
+                        break;
+                    }
+            }
+        }
+
+        private void ProcessInput()
+        {
+            if(GamePad.GetState(PlayerIndex.One).IsConnected == true)
+            {
+                InputManager.ProcessInputGamePad(PlayerIndex.One);
+            }
+            else
+            {
+                InputManager.ProcessInputKeyboard();
+            }
+
+            if(Movement != MovementType.Climb)
+            {
+                if (Velocity.X > 0)
+                {
+                    Facing = ActorFacing.Right;
+                }
+                else if (Velocity.X < 0)
+                {
+                    Facing = ActorFacing.Left;
+                }
+            }
+        }
+
+        private void UpdateRunWalk()
+        {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+
+            if (IsGrounded == false)
             {
                 // Add Gravity
                 FallVector = FallVector + new Vector2(0, Global.GRAVITY_RATE * deltaTime);
@@ -124,45 +220,34 @@ namespace Hellscape
                     IsColliding = false;
                 }
 
+                int propX = (int)ProposedPosition.X;
+                int propY = (int)ProposedPosition.Y;
+
+                ProposedPosition = new Vector2(propX, propY);
+
                 Position = ProposedPosition;
                 Velocity = new Vector2(0);
                 CreateCollisionMask(Position, 32, 64);
             }
-
-            AnimationManager.Update();
         }
-        public void Draw()
+        private void UpdateClimb()
         {
-            if(Facing == ActorFacing.Right)
+            if(Velocity != new Vector2(0, 0))
             {
-                AnimationManager.Draw(CollisionMask, SpriteEffects.None);
-            }
-            else
-            {
-                AnimationManager.Draw(CollisionMask, SpriteEffects.FlipHorizontally);
-            }
-            
-            //spriteBatch.Draw(Sprite, Position, Color.White);
-        }
+                ProposedPosition = Position + Velocity;
+                CreateCollisionMask(ProposedPosition, 32, 64);
+                OnPlayerClimbed();
 
-        private void ProcessInput()
-        {
-            if(GamePad.GetState(PlayerIndex.One).IsConnected == true)
-            {
-                InputManager.ProcessInputGamePad(PlayerIndex.One);
-            }
-            else
-            {
-                InputManager.ProcessInputKeyboard();
-            }
-
-            if (Velocity.X > 0)
-            {
-                Facing = ActorFacing.Right;
-            }
-            else if (Velocity.X < 0)
-            {
-                Facing = ActorFacing.Left;
+                if(Movement == MovementType.Climb)
+                {
+                    Position = ProposedPosition;
+                    Velocity = new Vector2(0);
+                    CreateCollisionMask(Position, 32, 64);
+                }
+                else
+                {
+                    UpdateRunWalk();
+                }
             }
         }
 
@@ -218,6 +303,8 @@ namespace Hellscape
                 else
                 {
                     adjustedY = collisionMask.Height;
+                    Vector2 fallAdjust = new Vector2(FallVector.X, 0);
+                    FallVector = fallAdjust;
                 }
             }
             else
@@ -248,9 +335,26 @@ namespace Hellscape
             adjustPosition = new Vector2(adjustedX, adjustedY);
             ProposedPosition = ProposedPosition + adjustPosition;
         }
+
         public void PlayerFalling()
         {
             IsGrounded = false;
+        }
+        public void GrabLadder(EntityLadder ladder)
+        {
+            Movement = MovementType.Climb;
+            AnimationManager.Play(AnimationLibrary["climbLadder"]);
+            ActiveLadder = ladder;
+            MoveSpeed = WalkSpeed;
+            Move(new Vector2(ladder.Position.X, Position.Y));
+        }
+        public void DismountLadder()
+        {
+            ProposedPosition = Position;
+            Movement = MovementType.RunWalk;
+            AnimationManager.Play(AnimationLibrary["idle"]);
+            ActiveLadder = null;
+            OnPlayerMoved();
         }
         public void Move(Vector2 position)
         {
@@ -263,35 +367,57 @@ namespace Hellscape
 
         private void OnLeftPress(object source, MoveInputEventArgs args)
         {
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-            float velocityRate = MoveSpeed * deltaTime;
-            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-            Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
-
-            if(AnimationManager.Animation != AnimationLibrary["idle"])
+            if(Movement != MovementType.Climb)
             {
-                AnimationManager.Play(AnimationLibrary["idle"]);
+                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                float velocityRate = MoveSpeed * deltaTime;
+                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+                if (AnimationManager.Animation != AnimationLibrary["idle"])
+                {
+                    AnimationManager.Play(AnimationLibrary["idle"]);
+                }
             }
         }
         private void OnRightPress(object source, MoveInputEventArgs args)
         {
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-            float velocityRate = MoveSpeed * deltaTime;
-            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-            Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
-
-            if (AnimationManager.Animation != AnimationLibrary["idle"])
+            if(Movement != MovementType.Climb)
             {
-                AnimationManager.Play(AnimationLibrary["idle"]);
+                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                float velocityRate = MoveSpeed * deltaTime;
+                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+                if (AnimationManager.Animation != AnimationLibrary["idle"])
+                {
+                    AnimationManager.Play(AnimationLibrary["idle"]);
+                }
             }
         }
         private void OnUpPress(object source, MoveInputEventArgs args)
         {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+            float velocityRate = MoveSpeed * deltaTime;
+            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+            Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
 
+            if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+            {
+                AnimationManager.Play(AnimationLibrary["climbLadder"]);
+            }
         }
         private void OnDownPress(object source, MoveInputEventArgs args)
         {
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+            float velocityRate = MoveSpeed * deltaTime;
+            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+            Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
 
+            if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+            {
+                AnimationManager.Play(AnimationLibrary["climbLadder"]);
+            }
         }
         private void OnInteractPress(object source, EventArgs args)
         {
@@ -299,34 +425,47 @@ namespace Hellscape
         }
         private void OnJumpPress(object source, EventArgs args)
         {
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-
-            if (IsGrounded == true)
+            if(Movement != MovementType.Climb)
             {
-                float jumpRate = WalkSpeed * deltaTime;
-                FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 8f));
-                IsGrounded = false;
-                AnimationManager.Play(AnimationLibrary["jump"]);
+                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+
+                if (IsGrounded == true)
+                {
+                    float jumpRate = WalkSpeed * deltaTime;
+                    FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 8f));
+                    IsGrounded = false;
+                    AnimationManager.Play(AnimationLibrary["jump"]);
+                }
             }
         }
         private void OnRunPress(object source, EventArgs args)
         {
-            if(MoveSpeed < RunSpeed)
+            if(Movement != MovementType.Climb)
             {
-                MoveSpeed = RunSpeed;
+                if (MoveSpeed < RunSpeed)
+                {
+                    MoveSpeed = RunSpeed;
+                }
             }
         }
         private void OnRunRelease(object source, EventArgs args)
         {
-            if (MoveSpeed == RunSpeed)
+            if(Movement != MovementType.Climb)
             {
-                MoveSpeed = WalkSpeed;
+                if (MoveSpeed == RunSpeed)
+                {
+                    MoveSpeed = WalkSpeed;
+                }
             }
         }
 
         protected virtual void OnPlayerMoved()
         {
             PlayerMoved?.Invoke(this, EventArgs.Empty);
+        }
+        protected virtual void OnPlayerClimbed()
+        {
+            PlayerClimbed?.Invoke(this, new PlayerClimbedEventArgs() { Ladder = ActiveLadder } );
         }
         protected virtual void OnPlayerInteracted()
         {
