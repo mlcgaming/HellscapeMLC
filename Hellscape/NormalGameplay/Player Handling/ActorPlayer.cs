@@ -159,6 +159,9 @@ namespace Hellscape
                         break;
                     }
             }
+
+            Global.SpriteBatch.Draw(Global.DebugTexture, CollisionMask, Color.Blue * 0.5f);
+            Global.SpriteBatch.Draw(Global.DebugTexture, new Rectangle(CollisionMask.X, CollisionMask.Bottom, CollisionMask.Width, 1), Color.Yellow * 0.5f);
         }
 
         private void ProcessInput()
@@ -364,6 +367,21 @@ namespace Hellscape
             IsGrounded = true;
             OnPlayerMoved();
         }
+        public void MoveSilent(Vector2 position)
+        {
+            ProposedPosition = position;
+            Position = position;
+            CreateCollisionMask(Position, 32, 64);
+            IsGrounded = true;
+        }
+        public void AdjustProposition(Vector2 adjustment)
+        {
+            if(Position.Y != adjustment.Y)
+            {
+                ProposedPosition = adjustment;
+                OnPlayerMoved();
+            }
+        }
 
         private void OnLeftPress(object source, MoveInputEventArgs args)
         {
@@ -397,26 +415,32 @@ namespace Hellscape
         }
         private void OnUpPress(object source, MoveInputEventArgs args)
         {
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-            float velocityRate = MoveSpeed * deltaTime;
-            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-            Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
-
-            if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+            if(Movement == MovementType.Climb)
             {
-                AnimationManager.Play(AnimationLibrary["climbLadder"]);
+                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                float velocityRate = MoveSpeed * deltaTime;
+                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
+
+                if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+                {
+                    AnimationManager.Play(AnimationLibrary["climbLadder"]);
+                }
             }
         }
         private void OnDownPress(object source, MoveInputEventArgs args)
         {
-            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-            float velocityRate = MoveSpeed * deltaTime;
-            float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-            Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
-
-            if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+            if(Movement == MovementType.Climb)
             {
-                AnimationManager.Play(AnimationLibrary["climbLadder"]);
+                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                float velocityRate = MoveSpeed * deltaTime;
+                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                Velocity = Velocity + new Vector2(0, adjustedMoveSpeed);
+
+                if (AnimationManager.Animation != AnimationLibrary["climbLadder"])
+                {
+                    AnimationManager.Play(AnimationLibrary["climbLadder"]);
+                }
             }
         }
         private void OnInteractPress(object source, EventArgs args)

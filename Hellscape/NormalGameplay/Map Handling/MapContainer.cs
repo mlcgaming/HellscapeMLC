@@ -83,6 +83,12 @@ namespace Hellscape
                                 CollisionSolids.Add(_newCollisionObject);
                                 break;
                             }
+                        case "CollisionSolidAngle":
+                            {
+                                EntityCollisionSolid _newCollision = new EntityCollisionSolid(_sceneObject.Position, (int)_sceneObject.Size.Width, (int)_sceneObject.Size.Height, float.Parse(_sceneObject.Properties["Tilt"]));
+                                CollisionSolids.Add(_newCollision);
+                                break;
+                            }
                     }
                 }
             }
@@ -162,6 +168,15 @@ namespace Hellscape
                 foreach (TileEntitySceneObject o in TileSceneObjects)
                 {
                     o.Draw();
+                }
+            }
+
+            foreach (EntityCollisionSolid solid in CollisionSolids)
+            {
+                if (solid.IsAngled == true)
+                {
+                    Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), new Vector2(ActiveMap.WidthInPixels, Common.GetYFromSlope(ActiveMap.WidthInPixels, solid.Tilt, solid.YIntercept)), Color.Red, 2f);
+                    //Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), ActiveMap.WidthInPixels, solid.Tilt, Color.Red, 1f);
                 }
             }
         }

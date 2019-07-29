@@ -27,6 +27,8 @@ namespace Hellscape
         public static Dictionary<string, bool> DoorTriggers = new Dictionary<string, bool>();
         public static List<SceneObject> SceneObjects = new List<SceneObject>();
 
+        public static Texture2D DebugTexture;
+
         public static bool IsNetworkGame;
 
         public static void InitializeDefaults(ContentManager content, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, GameWindow window)
@@ -49,6 +51,8 @@ namespace Hellscape
 
             Directory.CreateDirectory(DefaultsPath);
             PopulateRoomSceneObjectLists();
+
+            DebugTexture = Content.Load<Texture2D>("GFX/SinglePixel");
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
         {

@@ -23,6 +23,18 @@ namespace Hellscape
         {
             return new Rectangle((int)position.X, (int)position.Y, width, height);
         }
+        public static int GetCollisionAngleIntersect(Point xZeroYOnMask, float rate = 1f)
+        {
+            return (int)(xZeroYOnMask.Y - (rate * xZeroYOnMask.X));
+        }
+        public static int GetCollisionAngleY(EntityCollisionSolid collisionObject, int playerCollisionMaskSide)
+        {
+            return (int)((playerCollisionMaskSide * collisionObject.Tilt) - collisionObject.YIntercept);
+        }
+        public static int GetYFromSlope(int x, float slope, int intercept)
+        {
+            return (int)(x * slope) + intercept;
+        }
         public static Vector2 AdjustText(Vector2 position, BitmapFont font, string text, TextHalign halign, TextValign valign)
         {
             Vector2 stringMeasure = font.MeasureString(text);

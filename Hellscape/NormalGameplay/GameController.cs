@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,7 +10,6 @@ using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.Tiled.Graphics;
 using MonoGame.Extended.ViewportAdapters;
-using System.Linq;
 
 namespace Hellscape
 {
@@ -24,6 +24,7 @@ namespace Hellscape
         private BoxingViewportAdapter GameViewport;
         private TiledMapRenderer MapRenderer;
         private bool IsCameraMobile;
+        private Vector2 MaxCameraPosition;
 
         private List<TileSceneObject> TileSceneObjects;
         private Texture2D PauseScreen;
@@ -91,6 +92,8 @@ namespace Hellscape
             MapContainer = new MapContainer();
             MapContainer.MapLoaded += OnMapLoad;
             MapContainer.LoadMap("DebugRoom3");
+
+            MaxCameraPosition = new Vector2(0);
 
             TileSceneObjects = new List<TileSceneObject>();
 
@@ -303,7 +306,7 @@ namespace Hellscape
             if (GameCamera.BoundingRectangle.Bottom > MapContainer.BoundingBox.Height)
             {
                 cameraX = (int)GameCamera.Position.X;
-                cameraY = MapContainer.BoundingBox.Height - (int)GameCamera.BoundingRectangle.Height;
+                cameraY = (int)MaxCameraPosition.Y;
                 _adjustPosition = new Vector2(cameraX, cameraY);
                 GameCamera.Position = _adjustPosition;
             }
@@ -318,7 +321,7 @@ namespace Hellscape
 
             if (GameCamera.BoundingRectangle.Right > MapContainer.BoundingBox.Width)
             {
-                cameraX = MapContainer.BoundingBox.Width - (int)GameCamera.BoundingRectangle.Width;
+                cameraX = (int)MaxCameraPosition.X;
                 cameraY = (int)GameCamera.Position.Y;
                 _adjustPosition = new Vector2(cameraX, cameraY);
                 GameCamera.Position = _adjustPosition;
@@ -330,6 +333,36 @@ namespace Hellscape
                 cameraY = (int)GameCamera.Position.Y;
                 _adjustPosition = new Vector2(cameraX, cameraY);
                 GameCamera.Position = _adjustPosition;
+            }
+        }
+        private void SetMaxCameraPosition()
+        {
+            int maxX, maxY;
+
+            maxX = MapContainer.ActiveMap.WidthInPixels - (int)GameCamera.BoundingRectangle.Width;
+            maxY = MapContainer.ActiveMap.HeightInPixels - (int)GameCamera.BoundingRectangle.Height;
+
+            MaxCameraPosition = new Vector2(maxX, maxY);
+        }
+        private void AdjustPlayerToStairs(EntityCollisionSolid solid)
+        {
+            if (solid.Tilt > 0)
+            {
+                int checkY = Common.GetYFromSlope(Player.CollisionMask.Left, solid.Tilt, solid.YIntercept);
+
+                if (Player.CollisionMask.Bottom > checkY)
+                {
+                    Player.MoveSilent(new Vector2(Player.Position.X, Common.GetYFromSlope(Player.CollisionMask.Left, solid.Tilt, solid.YIntercept) - Player.CollisionMask.Height));
+                }
+            }
+            else
+            {
+                int checkY = Common.GetYFromSlope(Player.CollisionMask.Right, solid.Tilt, solid.YIntercept);
+
+                if (Player.CollisionMask.Bottom > checkY)
+                {
+                    Player.MoveSilent(new Vector2(Player.Position.X, Common.GetYFromSlope(Player.CollisionMask.Right, solid.Tilt, solid.YIntercept) - Player.CollisionMask.Height));
+                }
             }
         }
 
@@ -356,22 +389,43 @@ namespace Hellscape
             // Check for Collisions against ProposedPosition on Player
             foreach (EntityCollisionSolid solid in MapContainer.CollisionSolids)
             {
-                if (Player.CollisionMask.Intersects(solid.CollisionMask) == true)
+                if(solid.IsAngled == false)
                 {
-                    Rectangle _collision = Rectangle.Intersect(Player.CollisionMask, solid.CollisionMask);
-                    Player.AddCollision(_collision);
+                    if (Player.CollisionMask.Intersects(solid.CollisionMask) == true)
+                    {
+                        Rectangle _collision = Rectangle.Intersect(Player.CollisionMask, solid.CollisionMask);
+                        Player.AddCollision(_collision);
+                    }
+                }
+                if (solid.IsAngled == true)
+                {
+                    if(Player.CollisionMask.Intersects(solid.CollisionMask) == true)
+                    {
+                        AdjustPlayerToStairs(solid);
+                    }
                 }
             }
 
-            if(Player.IsGrounded == true)
+            if (Player.IsGrounded == true)
             {
-                Rectangle belowPlayerMask = new Rectangle(Player.CollisionMask.X, Player.CollisionMask.Bottom, Player.CollisionMask.Width, 1);
+                Rectangle belowPlayerMask = new Rectangle(Player.CollisionMask.X, Player.CollisionMask.Bottom, Player.CollisionMask.Width, 3);
 
                 foreach (EntityCollisionSolid solid in MapContainer.CollisionSolids)
                 {
-                    if (belowPlayerMask.Intersects(solid.CollisionMask) == true)
+                    if(solid.IsAngled == false)
                     {
-                        return;
+                        if (belowPlayerMask.Intersects(solid.CollisionMask) == true)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (belowPlayerMask.Intersects(solid.CollisionMask) == true)
+                        {
+                            AdjustPlayerToStairs(solid);
+                            return;
+                        }
                     }
                 }
 
@@ -517,6 +571,7 @@ namespace Hellscape
             }
             else
             {
+                SetMaxCameraPosition();
                 IsCameraMobile = true;
             }
 
