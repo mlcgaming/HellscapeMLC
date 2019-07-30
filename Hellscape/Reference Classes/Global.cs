@@ -25,6 +25,7 @@ namespace Hellscape
         public static GraphicsDeviceManager Graphics;
         public static GameWindow Window;
         public static GameTime GameTime;
+        public static Dictionary<string, bool> ItemTriggers = new Dictionary<string, bool>();
         public static Dictionary<string, bool> DoorTriggers = new Dictionary<string, bool>();
         public static List<SceneObject> SceneObjects = new List<SceneObject>();
 
@@ -79,6 +80,10 @@ namespace Hellscape
             GameTime = gameTime;
         }
 
+        public static void PopulateItemTriggers()
+        {
+            ItemTriggers.Add("stoneObjectRoom7", false);
+        }
         public static void PopulateDoorTriggers()
         {
             DoorTriggers.Add("DebugRoom1", false);
