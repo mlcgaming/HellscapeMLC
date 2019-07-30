@@ -55,9 +55,14 @@ namespace Hellscape
 
         public void Update()
         {
-            InputManager.ProcessInputGamePad(PlayerIndex.One);
+            float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
 
+            if(SlotMoveTimer > 0)
+            {
+                SlotMoveTimer -= deltaTime;
+            }
 
+            InputManager.ProcessInput();
         }
         public void Draw()
         {
@@ -78,8 +83,15 @@ namespace Hellscape
             // There's still room in the Inventory if the Max Slot is not filled
             foreach(InventoryItem ii in Items)
             {
-                if(ii.Item == item.Object)
+                if(ii.Item.ShortName == "nullItem")
                 {
+                    //Inventory has open slot, just add
+                    ii.Replace(item.Object, item.Quantity);
+                    return true;
+                }
+                else if(ii.Item == item.Object)
+                {
+                    // Items are the same, compare quantity
                     if(ii.Quantity + item.Quantity <= item.Object.MaxQuantity)
                     {
                         ii.SetQuantity(ii.Quantity + item.Quantity);
@@ -100,15 +112,8 @@ namespace Hellscape
                 }
             }
 
-            if (Items.Count < MaxSlots)
-            {
-                Items.Add(new InventoryItem(item.Object, item.Quantity));
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //Add Item Failed, Display Dialog here when implemented for "Not Enough Space"
+            return false;
         }
 
         public void Activate(Camera2D camera)
@@ -119,6 +124,8 @@ namespace Hellscape
             {
                 Items.ElementAt(i).SetupInventoryItem(new Vector2((int)itemPosition.X, itemPosition.Y + (36 * i)));
             }
+
+            Items.ElementAt(CurrentSlot).Select();
 
             Active = true;
         }
@@ -131,7 +138,9 @@ namespace Hellscape
         {
             if(SlotMoveTimer <= 0)
             {
-                if(CurrentSlot == MaxSlots)
+                Items.ElementAt(CurrentSlot).Deselect();
+
+                if(CurrentSlot == MaxSlots - 1)
                 {
                     CurrentSlot = 0;
                 }
@@ -140,6 +149,8 @@ namespace Hellscape
                     CurrentSlot += 1;
                 }
 
+                Items.ElementAt(CurrentSlot).Select();
+
                 SlotMoveTimer = 0.35f;
             }
         }
@@ -147,14 +158,18 @@ namespace Hellscape
         {
             if (SlotMoveTimer <= 0)
             {
+                Items.ElementAt(CurrentSlot).Deselect();
+
                 if (CurrentSlot == 0)
                 {
-                    CurrentSlot = MaxSlots;
+                    CurrentSlot = MaxSlots - 1;
                 }
                 else
                 {
                     CurrentSlot -= 1;
                 }
+
+                Items.ElementAt(CurrentSlot).Select();
 
                 SlotMoveTimer = 0.35f;
             }

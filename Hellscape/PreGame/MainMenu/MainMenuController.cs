@@ -77,8 +77,7 @@ namespace Hellscape
                 InputTimer -= deltaTime;
             }
 
-            InputManager.ProcessInputGamePad(PlayerIndex.One);
-            InputManager.ProcessInputKeyboard();
+            InputManager.ProcessInput();
         }
         public void Draw()
         {

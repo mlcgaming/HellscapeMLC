@@ -9,6 +9,7 @@ namespace Hellscape
         public SceneObject Item { get; protected set; }
         public int Quantity { get; set; }
         public AnimationManager AnimationManager { get; protected set; }
+        private bool IsSelected;
         private Rectangle IconRectangle, LongNameRectangle, QuantityRectangle;
         private Vector2 LongNamePosition, QuantityPosition;
 
@@ -17,7 +18,18 @@ namespace Hellscape
             Item = item;
             Quantity = qty;
 
+            IsSelected = false;
+
             AnimationManager = new AnimationManager();
+            AnimationManager.Play(Item.Animation);
+        }
+
+        public void Replace(SceneObject item, int qty)
+        {
+            Item = item;
+            Quantity = qty;
+
+            AnimationManager.Play(Item.Animation);
         }
 
         public void SetQuantity(int newQty)
@@ -28,10 +40,12 @@ namespace Hellscape
         public void Select()
         {
             AnimationManager.Play(Item.Animation);
+            IsSelected = true;
         }
         public void Deselect()
         {
             AnimationManager.Stop();
+            IsSelected = false;
         }
 
         public void SetupInventoryItem(Vector2 position)
@@ -60,12 +74,19 @@ namespace Hellscape
 
         public void Draw()
         {
-            Global.SpriteBatch.Draw(Global.DebugTexture, IconRectangle, Color.DarkGray);
-            AnimationManager.Draw(IconRectangle, SpriteEffects.None);
+            float alpha = 1f;
 
-            Global.SpriteBatch.DrawString(Global.DebugFont, Item.LongName, LongNamePosition, Color.White);
+            if(IsSelected == false)
+            {
+                alpha = 0.5f;
+            }
 
-            Global.SpriteBatch.DrawString(Global.DebugFont, "x" + Quantity.ToString(), QuantityPosition, Color.White);
+            Global.SpriteBatch.Draw(Global.DebugTexture, IconRectangle, Color.DarkGray * alpha);
+            AnimationManager.Draw(IconRectangle, SpriteEffects.None, alpha);
+
+            Global.SpriteBatch.DrawString(Global.DebugFont, Item.LongName, LongNamePosition, Color.White * alpha);
+
+            Global.SpriteBatch.DrawString(Global.DebugFont, "x" + Quantity.ToString(), QuantityPosition, Color.White * alpha);
         }
     }
 }

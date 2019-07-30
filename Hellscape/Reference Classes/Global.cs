@@ -46,6 +46,9 @@ namespace Hellscape
             Window = window;
             GameTime = null;
 
+            DebugTexture = Content.Load<Texture2D>("GFX/SinglePixel");
+            DebugFont = content.Load<BitmapFont>("GFX/Fonts/DebugFont");
+
             IsNetworkGame = false;
 
             PopulateDoorTriggers();
@@ -53,10 +56,6 @@ namespace Hellscape
 
             Directory.CreateDirectory(DefaultsPath);
             PopulateRoomSceneObjectLists();
-
-            DebugTexture = Content.Load<Texture2D>("GFX/SinglePixel");
-            DebugFont = content.Load<BitmapFont>("GFX/Fonts/DebugFont");
-
         }
         public static void SetAudioLevels(float bgmVolume, float sfxVolume)
         {
@@ -86,7 +85,7 @@ namespace Hellscape
         }
         public static void PopulateSceneObjects()
         {
-            SceneObject nullItem = new SceneObject("nullItem", "", 1, new Animation(DebugTexture, 1, 1, 1, 0, new Vector2(0, 0)));
+            SceneObject nullItem = new SceneObject("nullItem", "DEBUGITEM", 1, new Animation(DebugTexture, 1, 1, 1, 0, new Vector2(0, 0)));
             SceneObjects.Add(nullItem);
 
             SceneObject goldKey = new SceneObject("soKeyGold", "Gold Key", 1, new Animation(Content.Load<Texture2D>("GFX/Tiles/SceneObjects"), 1, 16, 16, 0f, new Vector2(0, 0)));

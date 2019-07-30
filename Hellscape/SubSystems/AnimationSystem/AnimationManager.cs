@@ -58,12 +58,12 @@ namespace Hellscape
                 (int)Animation.FrameStartPosition.Y, Animation.FrameWidth, Animation.FrameHeight),
                 Color.White);
         }
-        public void Draw(Rectangle rectangle, SpriteEffects effects)
+        public void Draw(Rectangle rectangle, SpriteEffects effects, float alpha = 1f)
         {
             Global.SpriteBatch.Draw(Animation.Texture, rectangle,
                 new Rectangle((int)Animation.FrameStartPosition.X + (Animation.CurrentFrame * Animation.FrameWidth),
                 (int)Animation.FrameStartPosition.Y, Animation.FrameWidth, Animation.FrameHeight),
-                Color.White, 0f, new Vector2(0), effects, 0f);
+                Color.White * alpha, 0f, new Vector2(0), effects, 0f);
         }
     }
 }

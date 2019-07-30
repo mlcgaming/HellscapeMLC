@@ -39,6 +39,7 @@ namespace Hellscape
 
         public ActorFacing Facing { get; private set; }
         public MovementType Movement { get; private set; }
+        private MovementType SavedMovement;
         public enum ActorFacing
         {
             Left,
@@ -49,7 +50,8 @@ namespace Hellscape
             Idle,
             RunWalk,
             Crawl,
-            Climb
+            Climb,
+            Paused
         }
 
         private AnimationManager AnimationManager;
@@ -81,6 +83,7 @@ namespace Hellscape
             AnimationLibrary = new Dictionary<string, Animation>();
             Facing = ActorFacing.Right;
             Movement = MovementType.RunWalk;
+            SavedMovement = MovementType.RunWalk;
 
             ActiveLadder = null;
 
@@ -158,10 +161,22 @@ namespace Hellscape
                         AnimationManager.Draw(CollisionMask, SpriteEffects.None);
                         break;
                     }
+                case MovementType.Paused:
+                    {
+                        if (Facing == ActorFacing.Right)
+                        {
+                            AnimationManager.Draw(CollisionMask, SpriteEffects.None);
+                        }
+                        else
+                        {
+                            AnimationManager.Draw(CollisionMask, SpriteEffects.FlipHorizontally);
+                        }
+                        break;
+                    }
             }
 
-            Global.SpriteBatch.Draw(Global.DebugTexture, CollisionMask, Color.Blue * 0.5f);
-            Global.SpriteBatch.Draw(Global.DebugTexture, new Rectangle(CollisionMask.X, CollisionMask.Bottom, CollisionMask.Width, 1), Color.Yellow * 0.5f);
+            //Global.SpriteBatch.Draw(Global.DebugTexture, CollisionMask, Color.Blue * 0.5f);
+            //Global.SpriteBatch.Draw(Global.DebugTexture, new Rectangle(CollisionMask.X, CollisionMask.Bottom, CollisionMask.Width, 1), Color.Yellow * 0.5f);
         }
 
         private void ProcessInput()
@@ -252,6 +267,16 @@ namespace Hellscape
                     UpdateRunWalk();
                 }
             }
+        }
+
+        public void Pause()
+        {
+            SavedMovement = Movement;
+            Movement = MovementType.Paused;
+        }
+        public void Unpause()
+        {
+            Movement = SavedMovement;
         }
 
         private void CreateCollisionMask(Vector2 position, int width, int height)
@@ -385,37 +410,43 @@ namespace Hellscape
 
         private void OnLeftPress(object source, MoveInputEventArgs args)
         {
-            if(Movement != MovementType.Climb)
+            if(Movement != MovementType.Paused)
             {
-                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-                float velocityRate = MoveSpeed * deltaTime;
-                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-                Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
-
-                if (AnimationManager.Animation != AnimationLibrary["idle"])
+                if (Movement != MovementType.Climb)
                 {
-                    AnimationManager.Play(AnimationLibrary["idle"]);
+                    float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                    float velocityRate = MoveSpeed * deltaTime;
+                    float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                    Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+                    if (AnimationManager.Animation != AnimationLibrary["idle"])
+                    {
+                        AnimationManager.Play(AnimationLibrary["idle"]);
+                    }
                 }
             }
         }
         private void OnRightPress(object source, MoveInputEventArgs args)
         {
-            if(Movement != MovementType.Climb)
+            if(Movement != MovementType.Paused)
             {
-                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-                float velocityRate = MoveSpeed * deltaTime;
-                float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
-                Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
-
-                if (AnimationManager.Animation != AnimationLibrary["idle"])
+                if (Movement != MovementType.Climb)
                 {
-                    AnimationManager.Play(AnimationLibrary["idle"]);
+                    float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+                    float velocityRate = MoveSpeed * deltaTime;
+                    float adjustedMoveSpeed = (int)Math.Round(args.InputValue * velocityRate);
+                    Velocity = Velocity + new Vector2(adjustedMoveSpeed, 0);
+
+                    if (AnimationManager.Animation != AnimationLibrary["idle"])
+                    {
+                        AnimationManager.Play(AnimationLibrary["idle"]);
+                    }
                 }
             }
         }
         private void OnUpPress(object source, MoveInputEventArgs args)
         {
-            if(Movement == MovementType.Climb)
+            if (Movement == MovementType.Climb)
             {
                 float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
                 float velocityRate = MoveSpeed * deltaTime;
@@ -445,40 +476,52 @@ namespace Hellscape
         }
         private void OnInteractPress(object source, EventArgs args)
         {
-            PlayerInteracted?.Invoke(this, EventArgs.Empty);
+            if(Movement != MovementType.Paused)
+            {
+                PlayerInteracted?.Invoke(this, EventArgs.Empty);
+            }
         }
         private void OnJumpPress(object source, EventArgs args)
         {
-            if(Movement != MovementType.Climb)
+            if(Movement != MovementType.Paused)
             {
-                float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
-
-                if (IsGrounded == true)
+                if (Movement != MovementType.Climb)
                 {
-                    float jumpRate = WalkSpeed * deltaTime;
-                    FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 8f));
-                    IsGrounded = false;
-                    AnimationManager.Play(AnimationLibrary["jump"]);
+                    float deltaTime = (float)Global.GameTime.ElapsedGameTime.TotalSeconds;
+
+                    if (IsGrounded == true)
+                    {
+                        float jumpRate = WalkSpeed * deltaTime;
+                        FallVector = new Vector2(0, -(int)Math.Round(jumpRate * 8f));
+                        IsGrounded = false;
+                        AnimationManager.Play(AnimationLibrary["jump"]);
+                    }
                 }
             }
         }
         private void OnRunPress(object source, EventArgs args)
         {
-            if(Movement != MovementType.Climb)
+            if(Movement != MovementType.Paused)
             {
-                if (MoveSpeed < RunSpeed)
+                if (Movement != MovementType.Climb)
                 {
-                    MoveSpeed = RunSpeed;
+                    if (MoveSpeed < RunSpeed)
+                    {
+                        MoveSpeed = RunSpeed;
+                    }
                 }
             }
         }
         private void OnRunRelease(object source, EventArgs args)
         {
-            if(Movement != MovementType.Climb)
+            if(Movement != MovementType.Paused)
             {
-                if (MoveSpeed == RunSpeed)
+                if (Movement != MovementType.Climb)
                 {
-                    MoveSpeed = WalkSpeed;
+                    if (MoveSpeed == RunSpeed)
+                    {
+                        MoveSpeed = WalkSpeed;
+                    }
                 }
             }
         }

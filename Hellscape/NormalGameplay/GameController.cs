@@ -417,7 +417,17 @@ namespace Hellscape
         }
         private void OnInventoryPressed(object source, EventArgs args)
         {
-            Mode = GameMode.Inventory;
+            if(Mode == GameMode.Inventory)
+            {
+                Mode = GameMode.Normal;
+                Player.Unpause();
+            }
+            else if(Mode == GameMode.Normal)
+            {
+                Player.Inventory.Activate(GameCamera);
+                Player.Pause();
+                Mode = GameMode.Inventory;
+            }
         }
         public void OnPlayerMove(object source, EventArgs e)
         {

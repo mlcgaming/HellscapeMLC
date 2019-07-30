@@ -34,6 +34,10 @@ namespace Hellscape
         public static void Initialize()
         {
             KeysPressed.Add(Keys.E, false);
+            KeysPressed.Add(Keys.D, false);
+            KeysPressed.Add(Keys.S, false);
+            KeysPressed.Add(Keys.W, false);
+            KeysPressed.Add(Keys.A, false);
             KeysPressed.Add(Keys.I, false);
             KeysPressed.Add(Keys.Space, false);
             KeysPressed.Add(Keys.LeftShift, false);
@@ -50,37 +54,141 @@ namespace Hellscape
             ButtonsPressed.Add(Buttons.Start, false);
             ButtonsPressed.Add(Buttons.Back, false);
         }
+        public static void ProcessInput()
+        {
+            GPState = GamePad.GetState(PlayerIndex.One);
+            if(GPState.IsConnected == true)
+            {
+                ProcessInputGamePad(PlayerIndex.One);
+            }
+            else
+            {
+                ProcessInputKeyboard();
+            }
+        }
         public static void ProcessInputKeyboard()
         {
             KeyState = Keyboard.GetState();
 
             if(KeyState.IsKeyDown(Keys.W) == true)
             {
+                KeysPressed[Keys.W] = true;
                 OnMovedUp(1.0f);
             }
+            if (KeyState.IsKeyUp(Keys.W) == true)
+            {
+                if (KeysPressed[Keys.W] == true)
+                {
+                    KeysPressed[Keys.W] = false;
+                    OnHorizontalReleased();
+                }
+            }
+
             if (KeyState.IsKeyDown(Keys.S) == true)
             {
+                KeysPressed[Keys.S] = true;
                 OnMovedDown(1.0f);
             }
+            if (KeyState.IsKeyUp(Keys.S) == true)
+            {
+                if (KeysPressed[Keys.S] == true)
+                {
+                    KeysPressed[Keys.S] = false;
+                    OnHorizontalReleased();
+                }
+            }
+
             if (KeyState.IsKeyDown(Keys.A) == true)
             {
+                KeysPressed[Keys.A] = true;
                 OnMovedLeft(-1.0f);
             }
+            if (KeyState.IsKeyUp(Keys.A) == true)
+            {
+                if (KeysPressed[Keys.A] == true)
+                {
+                    KeysPressed[Keys.A] = false;
+                    OnVerticalReleased();
+                }
+            }
+
             if (KeyState.IsKeyDown(Keys.D) == true)
             {
+                KeysPressed[Keys.D] = true;
                 OnMovedRight(1.0f);
             }
+            if (KeyState.IsKeyUp(Keys.D) == true)
+            {
+                if (KeysPressed[Keys.D] == true)
+                {
+                    KeysPressed[Keys.D] = false;
+                    OnVerticalReleased();
+                }
+            }
+
             if (KeyState.IsKeyDown(Keys.E) == true)
             {
-                OnInteractPressed();
+                if(KeysPressed[Keys.E] == false)
+                {
+                    KeysPressed[Keys.E] = true;
+                    OnInteractPressed();
+                }
             }
+            if (KeyState.IsKeyUp(Keys.E) == true)
+            {
+                if (KeysPressed[Keys.E] == true)
+                {
+                    KeysPressed[Keys.E] = false;
+                }
+            }
+
+            if (KeyState.IsKeyDown(Keys.I) == true)
+            {
+                if (KeysPressed[Keys.I] == false)
+                {
+                    KeysPressed[Keys.I] = true;
+                    OnInventoryPressed();
+                }
+            }
+            if (KeyState.IsKeyUp(Keys.I) == true)
+            {
+                if (KeysPressed[Keys.I] == true)
+                {
+                    KeysPressed[Keys.I] = false;
+                }
+            }
+
             if (KeyState.IsKeyDown(Keys.Space) == true)
             {
-                OnJumpPressed();
+                if(KeysPressed[Keys.Space] == false)
+                {
+                    KeysPressed[Keys.Space] = true;
+                    OnJumpPressed();
+                }
             }
-            if(KeyState.IsKeyDown(Keys.LeftShift) == true)
+            if (KeyState.IsKeyUp(Keys.Space) == true)
             {
-                OnRunPressed();
+                if (KeysPressed[Keys.Space] == true)
+                {
+                    KeysPressed[Keys.Space] = false;
+                }
+            }
+
+            if (KeyState.IsKeyDown(Keys.LeftShift) == true)
+            {
+                if(KeysPressed[Keys.LeftShift] == false)
+                {
+                    KeysPressed[Keys.LeftShift] = true;
+                    OnRunPressed();
+                }
+            }
+            if (KeyState.IsKeyUp(Keys.LeftShift) == true)
+            {
+                if (KeysPressed[Keys.LeftShift] == true)
+                {
+                    KeysPressed[Keys.LeftShift] = false;
+                    OnRunReleased();
+                }
             }
         }
         public static void ProcessInputGamePad(PlayerIndex player)
@@ -251,6 +359,22 @@ namespace Hellscape
                     }
                 }
 
+                if (GPState.IsButtonDown(Buttons.Y) == true)
+                {
+                    if (ButtonsPressed[Buttons.Y] == false)
+                    {
+                        ButtonsPressed[Buttons.Y] = true;
+                        OnInventoryPressed();
+                    }
+                }
+                if (GPState.IsButtonUp(Buttons.Y) == true)
+                {
+                    if (ButtonsPressed[Buttons.Y] == true)
+                    {
+                        ButtonsPressed[Buttons.Y] = false;
+                    }
+                }
+
                 if (GPState.IsButtonDown(Buttons.Start) == true)
                 {
                     if (ButtonsPressed[Buttons.Start] == false)
@@ -332,6 +456,10 @@ namespace Hellscape
         public static void OnSelectPressed()
         {
             SelectPressed?.Invoke(null, EventArgs.Empty);
+        }
+        public static void OnInventoryPressed()
+        {
+            InventoryPressed?.Invoke(null, EventArgs.Empty);
         }
     }
 }
