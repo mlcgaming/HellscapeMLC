@@ -171,14 +171,14 @@ namespace Hellscape
                 }
             }
 
-            foreach (EntityCollisionSolid solid in CollisionSolids)
-            {
-                if (solid.IsAngled == true)
-                {
-                    Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), new Vector2(ActiveMap.WidthInPixels, Common.GetYFromSlope(ActiveMap.WidthInPixels, solid.Tilt, solid.YIntercept)), Color.Red, 2f);
-                    //Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), ActiveMap.WidthInPixels, solid.Tilt, Color.Red, 1f);
-                }
-            }
+            //foreach (EntityCollisionSolid solid in CollisionSolids)
+            //{
+            //    if (solid.IsAngled == true)
+            //    {
+            //        Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), new Vector2(ActiveMap.WidthInPixels, Common.GetYFromSlope(ActiveMap.WidthInPixels, solid.Tilt, solid.YIntercept)), Color.Red, 2f);
+            //        //Global.SpriteBatch.DrawLine(new Vector2(0, solid.YIntercept), ActiveMap.WidthInPixels, solid.Tilt, Color.Red, 1f);
+            //    }
+            //}
         }
 
         public void RemoveTileSceneObject(TileEntitySceneObject obj)

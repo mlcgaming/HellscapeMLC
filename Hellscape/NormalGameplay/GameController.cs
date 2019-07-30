@@ -72,6 +72,7 @@ namespace Hellscape
 
             InputManager.StartPressed += OnStartPressed;
             InputManager.SelectPressed += OnSelectPressed;
+            InputManager.InventoryPressed += OnInventoryPressed;
 
             Player = new ActorPlayer(0, PlayerIndex.One, new Vector2(224, 192));
             Player.PlayerMoved += OnPlayerMove;
@@ -165,6 +166,11 @@ namespace Hellscape
                                     InputManager.ProcessInputGamePad(PlayerIndex.One);
                                     break;
                                 }
+                            case GameMode.Inventory:
+                                {
+                                    Player.Inventory.Update();
+                                    break;
+                                }
                         }
                         break;
                     }
@@ -248,6 +254,31 @@ namespace Hellscape
                                     
                                     Global.SpriteBatch.Draw(PauseScreen, (Rectangle)GameCamera.BoundingRectangle, Color.Black * 0.5f);
                                     Global.SpriteBatch.DrawString(PauseFont, "PAUSED", pausePosition, Color.White);
+
+                                    Global.SpriteBatch.End();
+
+                                    break;
+                                }
+                            case GameMode.Inventory:
+                                {
+                                    Global.SpriteBatch.Begin(transformMatrix: transformMatrix, samplerState: SamplerState.PointClamp);
+
+                                    MapRenderer.Draw(MapContainer.ActiveMap, transformMatrix);
+                                    MapContainer.Draw();
+
+                                    if (TileSceneObjects.Count > 0)
+                                    {
+                                        foreach (TileSceneObject t in TileSceneObjects)
+                                        {
+                                            t.Draw();
+                                        }
+                                    }
+
+                                    Player.Draw();
+
+                                    Global.SpriteBatch.Draw(PauseScreen, (Rectangle)GameCamera.BoundingRectangle, Color.Black * 0.5f);
+
+                                    Player.Inventory.Draw();
 
                                     Global.SpriteBatch.End();
 
@@ -384,6 +415,10 @@ namespace Hellscape
                 OnGameExit();
             }
         }
+        private void OnInventoryPressed(object source, EventArgs args)
+        {
+            Mode = GameMode.Inventory;
+        }
         public void OnPlayerMove(object source, EventArgs e)
         {
             // Check for Collisions against ProposedPosition on Player
@@ -423,7 +458,34 @@ namespace Hellscape
                     {
                         if (belowPlayerMask.Intersects(solid.CollisionMask) == true)
                         {
-                            AdjustPlayerToStairs(solid);
+                            if (solid.Tilt > 0)
+                            {
+                                // Sloped Upward to the Left
+                                if (Player.Position.X > solid.Position.X && Player.Facing == ActorPlayer.ActorFacing.Right)
+                                {
+                                    // Player is Moving Right and is past the stair cutoff
+                                    int checkY = Common.GetYFromSlope(Player.CollisionMask.Left, solid.Tilt, solid.YIntercept);
+
+                                    if (Player.CollisionMask.Bottom < checkY)
+                                    {
+                                        Player.MoveSilent(new Vector2(Player.Position.X, Common.GetYFromSlope(Player.CollisionMask.Left, solid.Tilt, solid.YIntercept) - Player.CollisionMask.Height));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Sloped Upward to the Right
+                                if (Player.Position.X < solid.Position.X && Player.Facing == ActorPlayer.ActorFacing.Left)
+                                {
+                                    // Player is Moving Left and is past the stair cutoff
+                                    int checkY = Common.GetYFromSlope(Player.CollisionMask.Right, solid.Tilt, solid.YIntercept);
+
+                                    if (Player.CollisionMask.Bottom < checkY)
+                                    {
+                                        Player.MoveSilent(new Vector2(Player.Position.X, Common.GetYFromSlope(Player.CollisionMask.Right, solid.Tilt, solid.YIntercept) - Player.CollisionMask.Height));
+                                    }
+                                }
+                            }
                             return;
                         }
                     }

@@ -37,9 +37,9 @@ namespace Hellscape
         public bool IsGrounded { get; private set; }
         private EntityLadder ActiveLadder;
 
-        private ActorFacing Facing;
+        public ActorFacing Facing { get; private set; }
         public MovementType Movement { get; private set; }
-        enum ActorFacing
+        public enum ActorFacing
         {
             Left,
             Right

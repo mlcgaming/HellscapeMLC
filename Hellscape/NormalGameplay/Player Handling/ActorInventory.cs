@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 
 namespace Hellscape
 {
@@ -12,6 +16,7 @@ namespace Hellscape
     public class ActorInventory
     {
         public event EventHandler<ItemUsedEventArgs> ItemUsed;
+        public event EventHandler CancelPressed;
 
         public List<InventoryItem> Items { get; protected set; }
         public int MaxSlots { get; protected set; }
@@ -22,14 +27,46 @@ namespace Hellscape
 
         public ActorInventory()
         {
-            Items = new List<InventoryItem>();
             MaxSlots = 6;
             CurrentSlot = 0;
 
             Active = false;
 
+            Initialize();
+
+            InputManager.UpPressed += OnUpPressed;
+            InputManager.DownPressed += OnDownPressed;
+            InputManager.VerticalReleased += OnVerticalReleased;
+            InputManager.InventoryPressed += OnCancelPressed;
             InputManager.InteractPressed += OnInteractPressed;
             InputManager.JumpPressed += OnInteractPressed;
+        }
+
+        private void Initialize()
+        {
+            Items = new List<InventoryItem>();
+
+            for(int i = 0; i < MaxSlots; i++)
+            {
+                InventoryItem newItem = new InventoryItem(Global.GetSceneObjectBYID("nullItem"), 1);
+                Items.Add(newItem);
+            }
+        }
+
+        public void Update()
+        {
+            InputManager.ProcessInputGamePad(PlayerIndex.One);
+
+
+        }
+        public void Draw()
+        {
+
+
+            foreach(InventoryItem ii in Items)
+            {
+                ii.Draw();
+            }
         }
 
         public void SetMaxSlots(int qty)
@@ -74,8 +111,15 @@ namespace Hellscape
             }
         }
 
-        public void Activate()
+        public void Activate(Camera2D camera)
         {
+            Vector2 itemPosition = new Vector2(camera.BoundingRectangle.Center.X - 160, camera.BoundingRectangle.Center.Y - 108);
+
+            for(int i = 0; i < MaxSlots; i++)
+            {
+                Items.ElementAt(i).SetupInventoryItem(new Vector2((int)itemPosition.X, itemPosition.Y + (36 * i)));
+            }
+
             Active = true;
         }
         public void Deactivate()
@@ -83,7 +127,7 @@ namespace Hellscape
             Active = false;
         }
 
-        private void OnDownPressed(object obj, EventArgs args)
+        protected virtual void OnDownPressed(object source, EventArgs args)
         {
             if(SlotMoveTimer <= 0)
             {
@@ -99,7 +143,7 @@ namespace Hellscape
                 SlotMoveTimer = 0.35f;
             }
         }
-        private void OnUpPressed(object obj, EventArgs args)
+        protected virtual void OnUpPressed(object source, EventArgs args)
         {
             if (SlotMoveTimer <= 0)
             {
@@ -115,15 +159,23 @@ namespace Hellscape
                 SlotMoveTimer = 0.35f;
             }
         }
-        private void OnInteractPressed(object obj, EventArgs args)
+        protected virtual void OnVerticalReleased(object source, EventArgs args)
         {
-            if(Items.Count != 0 && Active == true)
+            SlotMoveTimer = 0f;
+        }
+        protected virtual void OnCancelPressed(object source, EventArgs args)
+        {
+            CancelPressed?.Invoke(this, EventArgs.Empty);
+        }
+        protected virtual void OnInteractPressed(object source, EventArgs args)
+        {
+            if(Items.ElementAt(CurrentSlot).Item.ShortName != "nullItem" && Active == true)
             {
                 OnItemUsed(this, new ItemUsedEventArgs() { Item = Items.ElementAt(CurrentSlot).Item, Quantity = Items.ElementAt(CurrentSlot).Quantity });
             }
         }
 
-        protected virtual void OnItemUsed(object obj, ItemUsedEventArgs args)
+        protected virtual void OnItemUsed(object source, ItemUsedEventArgs args)
         {
             ItemUsed?.Invoke(this, args);
         }
